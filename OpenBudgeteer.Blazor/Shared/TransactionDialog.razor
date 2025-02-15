@@ -1,60 +1,54 @@
-﻿@using OpenBudgeteer.Core.ViewModels
+﻿@using System.Drawing
 @using System.Globalization
 @using OpenBudgeteer.Core.Data.Entities.Models
+@using OpenBudgeteer.Core.ViewModels.EntityViewModels
 @using OpenBudgeteer.Core.ViewModels.Helper
+@using Color = MudBlazor.Color
+@using Size = MudBlazor.Size
 
-@if (IsDialogVisible)
- {
-     <div class="modal fade show" style=" display: block;">
-         <div class="modal-dialog modal-dialog-scrollable" style="max-width: 1300px">
-             <div class="modal-content">
-                 <div class="modal-header">
-                     <h4 class="modal-title">@Title</h4>
-                     <button type="button" class="btn-close" data-dismiss="modal" @onclick="OnClickCallback"></button>
-                 </div>
-                 <div class="modal-body">
-                     @if (IsDialogLoading)
-                     {
-                         <div>Loading...</div>
-                     }
-                     else
-                     {
-                         <table class="table table-sm table-hover">
-                             <thead>
-                                 <tr class="header-row">
-                                     <th style="text-align: right; width:110px">Date</th>
-                                     <th class="d-none d-lg-table-cell" style="width:150px">Account</th>
-                                     <th class="d-none d-lg-table-cell" style="width:250px">Payee</th>
-                                     <th>Memo</th>
-                                     <th style="text-align: right; width: 120px">Amount</th>
-                                 </tr>
-                             </thead>
-                             <tbody>
-                                 @foreach (var transaction in DataContext.Transactions)
-                                 {
-                                     <tr>
-                                         <td style="text-align: right">@transaction.TransactionDate.ToShortDateString()</td>
-                                         <td class="d-none d-lg-table-cell">@transaction.SelectedAccount.Name</td>
-                                         <td class="d-none d-lg-table-cell">@transaction.Payee</td>
-                                         <td>@transaction.Memo</td>
-                                         <td style="text-align: right">@transaction.Amount.ToString("C", CultureInfo.CurrentCulture)</td>
-                                     </tr>
-                                 }
-                             </tbody>
-                         </table>
-                     }
-                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal" @onclick="OnClickCallback">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal-backdrop fade show"></div>
- }
+<MudDialog Class="dialog-background">
+    <TitleContent>
+        <MudText Typo="Typo.h6">@Title</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudDataGrid
+            T="TransactionViewModel"
+            Items="@DataContext.Transactions"
+            Dense="true"
+            Filterable="true"
+            Hover="true"
+            ReadOnly="true"
+            SortMode="SortMode.Multiple">
+            <Columns>
+                <PropertyColumn Property="x => x.TransactionDate" Title="Date">
+                    <CellTemplate>
+                        <MudText>@context.Item.TransactionDate.ToShortDateString()</MudText>
+                    </CellTemplate>
+                </PropertyColumn>
+                <PropertyColumn Property="x => x.SelectedAccount" Title="Account" CellStyle="min-width: 150px">
+                    <CellTemplate>
+                        <MudText>@context.Item.SelectedAccount.Name</MudText>
+                    </CellTemplate>
+                </PropertyColumn>
+                <PropertyColumn Property="x => x.Payee"/>
+                <PropertyColumn Property="x => x.Memo"/>
+                <PropertyColumn Property="x => x.Amount">
+                    <CellTemplate>
+                        <MudText Class="col-numbers">@context.Item.Amount.ToString("C", CultureInfo.CurrentCulture)</MudText>
+                    </CellTemplate>
+                </PropertyColumn>
+            </Columns>
+        </MudDataGrid>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Error" OnClick="CloseDialog">Close</MudButton>
+    </DialogActions>
+</MudDialog>
 
 @code {
-
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = null!;
+    
     [Parameter]
     public string Title { get; set; } = string.Empty;
 
@@ -72,4 +66,6 @@
 
     [Parameter]
     public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
+    
+    private void CloseDialog() => MudDialog.Close(DialogResult.Ok(true));
 }

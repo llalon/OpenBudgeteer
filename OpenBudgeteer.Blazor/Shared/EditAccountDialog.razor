@@ -1,30 +1,26 @@
 ﻿@using OpenBudgeteer.Core.ViewModels.EntityViewModels
-@if (IsDialogVisible)
- {
-    <div class="modal fade show" style=" display: block;">
-        <div class="modal-dialog modal-dialog-scrollable" style="max-width: 500px">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">@Title</h4>
-                    <button type="button" class="btn-close" data-dismiss="modal" @onclick="OnCancelClickCallback"></button>
-                </div>
-                <div class="modal-body">
-                    <div>
-                        <label class="form-label">Name:</label>
-                        <input class="form-control form-control-sm" type="text" @bind="DataContext.Name" />
-                    </div>                    
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal" @onclick="OnSaveClickCallback">Save</button>
-                    <button type="button" class="btn btn-danger" data-dismiss="modal" @onclick="OnCancelClickCallback">Cancel</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal-backdrop fade show"></div>
-}
+
+<MudDialog Class="dialog-background">
+    <TitleContent>
+        <MudText Typo="Typo.h6">@Title</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudGrid Spacing="4">
+            <MudItem xs="12">
+                <MudTextField Label="Name:" @bind-Value="DataContext.Name"/>
+            </MudItem>
+        </MudGrid>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" OnClick="ConfirmSave">Save</MudButton>
+        <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Error" OnClick="ConfirmCancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
 
 @code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = null!;
+    
     [Parameter]
     public string Title { get; set; } = string.Empty;
 
@@ -39,4 +35,8 @@
 
     [Parameter]
     public EventCallback<MouseEventArgs> OnSaveClickCallback { get; set; }
+    
+    private void ConfirmSave() => MudDialog.Close(DialogResult.Ok(true));
+
+    private void ConfirmCancel() => MudDialog.Cancel();
 }

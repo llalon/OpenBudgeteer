@@ -1,117 +1,79 @@
-﻿@using OpenBudgeteer.Core.ViewModels
-@using System.Drawing
+﻿@using System.Drawing
 @using System.Globalization
-@using OpenBudgeteer.Core.Data.Entities.Models
 @using OpenBudgeteer.Core.ViewModels.EntityViewModels
 @using OpenBudgeteer.Core.ViewModels.Helper
+@using Color = MudBlazor.Color
+@using Size = MudBlazor.Size
 @inject YearMonthSelectorViewModel YearMonthDataContext
 
-@if (IsDialogVisible)
-{
-    <div class="modal fade show" style=" display: block;">
-        <div class="modal-dialog modal-dialog-scrollable" style="max-width: 1000px">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Select Bucket</h4>
-                    <button type="button" class="btn-close" data-dismiss="modal" @onclick="OnCancelCallback"></button>
-                </div>
-                <div class="modal-body">
-                    @if (IsDialogLoading)
-                    {
-                        <div>Loading...</div>
-                    }
-                    else
-                    {
-                        <table class="table table-sm bucket-table">
-                            <thead>
-                                <tr class="header-row">
-                                    <th>Bucket</th>
-                                    <th class="col-numbers col-bucket-numbers">Balance</th>
-                                    <th class="d-none d-sm-table-cell col-numbers col-bucket-numbers">In</th>
-                                    <th class="d-none d-sm-table-cell col-numbers col-bucket-numbers">Activity</th>
-                                    <th class="d-none d-md-table-cell col-bucket-details">Details</th>
-                                </tr>
-                            </thead>
-                            <tbody><tr></tr></tbody>
-                        </table>
-
-                        @foreach (var bucketGroup in DataContext.BucketGroups)
+<MudDialog Class="dialog-background">
+    <TitleContent>
+        <MudText Typo="Typo.h6">Select Bucket</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTable
+            Items="@DataContext.LoadedBuckets"
+            Dense="true"
+            FixedHeader="true"
+            Hover="true"
+            GroupBy="@_groupByBucketGroup"
+            GroupHeaderStyle="background-color:var(--mud-palette-background-gray)">
+            <HeaderContent>
+                <MudTh>Bucket</MudTh>
+                <MudTh Class="col-numbers col-bucket-numbers">Balance</MudTh>
+                <MudTh Class="col-numbers col-bucket-numbers">In</MudTh>
+                <MudTh Class="col-numbers col-bucket-numbers">Activity</MudTh>
+                <MudTh>Details</MudTh>
+                <MudTh/>
+            </HeaderContent>
+            <GroupHeaderTemplate>
+                <MudTh>@((context.Key as BucketGroupViewModel)!.Name)</MudTh>
+                <MudTh Class="col-numbers col-bucket-numbers">@((context.Key as BucketGroupViewModel)!.TotalBalance.ToString("C", CultureInfo.CurrentCulture))</MudTh>
+                <MudTh Class="col-numbers col-bucket-numbers">@((context.Key as BucketGroupViewModel)!.TotalIn == 0 ? string.Empty : (context.Key as BucketGroupViewModel)!.TotalIn.ToString("C", CultureInfo.CurrentCulture))</MudTh>
+                <MudTh Class="col-numbers col-bucket-numbers">@((context.Key as BucketGroupViewModel)!.TotalActivity == 0 ? string.Empty : (context.Key as BucketGroupViewModel)!.TotalActivity.ToString("C", CultureInfo.CurrentCulture))</MudTh>
+                <MudTh/>
+                <MudTh/>
+            </GroupHeaderTemplate>
+            <RowTemplate>
+                <MudTd DataLabel="Bucket">
+                    <MudButton
+                        Size="Size.Small"
+                        Class="mud-width-full bucket-indicator"
+                        Style="@($"background-color: {ColorTranslator.ToHtml(context.Color)}; color: {ColorTranslator.ToHtml(context.TextColor)}")"
+                        OnClick="@(() => ConfirmSelection(context))">
+                        @context.Name
+                    </MudButton>
+                </MudTd>
+                <MudTd DataLabel="Balance" Class="col-numbers">@context.Balance.ToString("C", CultureInfo.CurrentCulture)</MudTd>
+                <MudTd DataLabel="In" Class="col-numbers">@(context.In == 0 ? string.Empty : context.In.ToString("C", CultureInfo.CurrentCulture))</MudTd>
+                <MudTd DataLabel="Activity" Class="col-numbers">@(context.Activity == 0 ? string.Empty : context.Activity.ToString("C", CultureInfo.CurrentCulture))</MudTd>
+                <MudTd DataLabel="Details" colspan="2">
+                    <MudStack Row StretchItems="StretchItems.Start">
+                        @if (context.IsProgressbarVisible)
                         {
-                            <table class="table table-sm bucket-table">
-                                <thead>
-                                    <tr class="header-row" @onmouseover="@(() => bucketGroup.IsHovered = true)" @onmouseout="@(() => bucketGroup.IsHovered = false)">
-                                        <th>
-                                            <div>
-                                                <button class="btn btn-sm header-action-button collapse-button"
-                                                        @onclick="@(() => bucketGroup.IsCollapsed = !bucketGroup.IsCollapsed)"><span>@(bucketGroup.IsCollapsed ? "▶" : "▼")</span></button>
-                                                <span class="bucketgroup-header-text">@bucketGroup.Name</span>
-                                            </div>
-                                        </th>
-                                        <th class="col-numbers col-bucket-numbers"><span class="bucketgroup-header-text">@bucketGroup.TotalBalance.ToString("C", CultureInfo.CurrentCulture)</span></th>
-                                        <th class="d-none d-sm-table-cell col-numbers col-bucket-numbers"><span class="bucketgroup-header-text">@(bucketGroup.TotalIn == 0 ? string.Empty : bucketGroup.TotalIn.ToString("C", CultureInfo.CurrentCulture))</span></th>
-                                        <th class="d-none d-sm-table-cell col-numbers col-bucket-numbers"><span class="bucketgroup-header-text">@(bucketGroup.TotalActivity == 0 ? string.Empty : bucketGroup.TotalActivity.ToString("C", CultureInfo.CurrentCulture))</span></th>
-                                        <th class="d-none d-md-table-cell col-bucket-details"></th>
-                                    </tr>
-                                </thead>
-                                <tbody><tr></tr></tbody>
-                            </table>
-
-                            <table class="table table-sm bucket-table">
-                                <tbody class="@(bucketGroup.IsCollapsed ? "collapse" : "")">
-                                    @foreach (var bucket in bucketGroup.Buckets)
-                                    {
-                                        <tr @onmouseover="@(() => bucket.IsHovered = true)" @onmouseout="@(() => bucket.IsHovered = false)">
-                                            <td>
-                                                <button class="btn btn-sm btn-bucket" style="background-color: @ColorTranslator.ToHtml(bucket.Color); color: @ColorTranslator.ToHtml(bucket.TextColor); text-align: left" @onclick="() => OnBucketSelectedCallback.InvokeAsync(bucket)">
-                                                    @if (bucket.IsInactive)
-                                                    {
-                                                        @($"{bucket.Name} (Inactive from: {bucket.IsInactiveFrom.ToShortDateString()})")
-                                                    }
-                                                    else
-                                                    {
-                                                        @bucket.Name
-                                                    }
-                                                </button>
-                                            </td>
-                                            <td class="col-numbers col-bucket-numbers">@bucket.Balance.ToString("C", CultureInfo.CurrentCulture)</td>
-                                            <td class="d-none d-sm-table-cell col-numbers col-bucket-numbers">@(bucket.In == 0 ? string.Empty : bucket.In.ToString("C", CultureInfo.CurrentCulture))</td>
-                                            <td class="d-none d-sm-table-cell col-numbers col-bucket-numbers">@(bucket.Activity == 0 ? string.Empty : bucket.Activity.ToString("C", CultureInfo.CurrentCulture))</td>
-                                            <td class="d-none d-md-table-cell col-bucket-details">
-                                            @if (bucket.IsProgressbarVisible)
-                                            {
-                                                <div class="row">
-                                                    <div class="col">
-                                                        <div class="progress">
-                                                            <div class="progress-bar" role="progressbar" style="width: @bucket.Progress%;" aria-valuenow="@bucket.Progress" aria-valuemin="0" aria-valuemax="100">
-                                                                @bucket.Progress%
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col" style="font-size: .75rem; text-align: center">
-                                                        @bucket.Details
-                                                    </div>
-                                                </div>
-                                            }
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
+                            <MudStack Spacing="1">
+                                <MudProgressLinear Color="Color.Info" Size="Size.Large" Rounded Value="context.Progress">
+                                    <MudText Typo="Typo.caption" Color="Color.Dark">
+                                        <b>@context.Progress%</b>
+                                    </MudText>
+                                </MudProgressLinear>
+                                <MudText Typo="Typo.caption" Align="Align.Center">@context.Details</MudText>
+                            </MudStack>
                         }
-                    }
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal" @onclick="OnCancelCallback">Cancel</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal-backdrop fade show"></div>
-}
+                    </MudStack>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Error" OnClick="CancelSelection">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
 
 @code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = null!;
+    
     [Parameter]
     public BucketListingViewModel DataContext { get; set; } = null!;
 
@@ -126,4 +88,15 @@
     
     [Parameter]
     public EventCallback<MouseEventArgs> OnCancelCallback { get; set; }
+    
+    private readonly TableGroupDefinition<BucketViewModel> _groupByBucketGroup = new()
+    {
+        GroupName = "Bucket Group:",
+        Expandable = true,
+        Selector = x => x.BucketGroupViewModel!
+    };
+    
+    private void CancelSelection() => MudDialog.Close();
+
+    private void ConfirmSelection(BucketViewModel bucket) => MudDialog.Close(DialogResult.Ok(bucket));
 }

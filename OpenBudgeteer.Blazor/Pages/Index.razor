@@ -1,6 +1,39 @@
 ﻿@page "/"
 
-<style>
+<MudStack Row="true">
+    <MudCard>
+        <MudCardMedia Image="css/icons8/code-fork.png"/>
+        <MudCardContent>
+            <MudText Typo="Typo.h5">OpenBudgeteer Repository</MudText>
+            <MudText Typo="Typo.body2">Access source code hosted on Github</MudText>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton Variant="Variant.Text" Color="Color.Primary" Href="https://github.com/TheAxelander/OpenBudgeteer" Target="_blank">Open Repository</MudButton>
+        </MudCardActions>
+    </MudCard>
+    <MudCard>
+        <MudCardMedia Image="css/icons8/answers.png"/>
+        <MudCardContent>
+            <MudText Typo="Typo.h5">Create Issue</MudText>
+            <MudText Typo="Typo.body2">Found a bug or missing a feature? Create an issue on Github</MudText>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton Variant="Variant.Text" Color="Color.Primary" Href="https://github.com/TheAxelander/OpenBudgeteer/issues/new" Target="_blank">Create Issue</MudButton>
+        </MudCardActions>
+    </MudCard>
+    <MudCard>
+        <MudCardMedia Image="css/icons8/announce.png"/>
+        <MudCardContent>
+            <MudText Typo="Typo.h5">Display Announcements</MudText>
+            <MudText Typo="Typo.body2">See latest updates and announcements.</MudText>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton Variant="Variant.Text" Color="Color.Primary" Href="https://github.com/TheAxelander/OpenBudgeteer/discussions/categories/announcements" Target="_blank">Display Announcements</MudButton>
+        </MudCardActions>
+    </MudCard>
+</MudStack>
+
+@*<style>
     .card-tile {
         margin: 15px;
         max-width: 450px;
@@ -56,4 +89,4 @@
             </div>
         </div>
     </div>
-</div>
+</div>*@

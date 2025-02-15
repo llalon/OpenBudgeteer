@@ -15,10 +15,10 @@ public partial class Report : ComponentBase
 {
     [Inject] private IServiceManager ServiceManager { get; set; } = null!;
     
-    private ApexChart<ReportRecord> _monthBalanceChart = null!;
-    private ApexChart<ReportRecord> _bankBalanceChart = null!;
-    private ApexChart<ReportRecord> _monthIncomeExpensesChart = null!;
-    private ApexChart<ReportRecord> _yearIncomeExpensesChart = null!;
+    private ApexChart<ReportRecord>? _monthBalanceChart;
+    private ApexChart<ReportRecord>? _bankBalanceChart;
+    private ApexChart<ReportRecord>? _monthIncomeExpensesChart;
+    private ApexChart<ReportRecord>? _yearIncomeExpensesChart;
     private List<ApexChart<ReportRecord>> _monthBucketExpensesCharts = new();
     private ApexChart<ReportRecord> InjectMonthBucketExpensesChart
     {
@@ -34,30 +34,34 @@ public partial class Report : ComponentBase
     private List<Tuple<string, List<ReportRecord>>> _monthBucketExpensesConfigsLeft = null!;
     private List<Tuple<string, List<ReportRecord>>> _monthBucketExpensesConfigsRight = null!;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         _monthBucketExpensesConfigsLeft = new List<Tuple<string, List<ReportRecord>>>();
         _monthBucketExpensesConfigsRight = new List<Tuple<string, List<ReportRecord>>>();
         _monthBucketExpensesCharts = new();
     
         _apexContext = new ApexReportViewModel(ServiceManager);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        
         await _apexContext.LoadDataAsync();
-    
         var halfIndex = _apexContext.MonthBucketExpenses.Count / 2;
         _monthBucketExpensesConfigsLeft.AddRange(_apexContext.MonthBucketExpenses.GetRange(0,halfIndex));
         _monthBucketExpensesConfigsRight.AddRange(_apexContext.MonthBucketExpenses.GetRange(halfIndex,_apexContext.MonthBucketExpenses.Count - halfIndex));
         
-        StateHasChanged();
-        var tasks = new List<Task>()
-        {
-            _monthBalanceChart.UpdateSeriesAsync(),
-            _bankBalanceChart.UpdateSeriesAsync(),
-            _monthIncomeExpensesChart.UpdateSeriesAsync(),
-            _yearIncomeExpensesChart.UpdateSeriesAsync()
-        };
+        var tasks = new List<Task>();
+        if (_monthBalanceChart != null) tasks.Add(_monthBalanceChart.UpdateSeriesAsync());
+        if (_bankBalanceChart != null) tasks.Add(_bankBalanceChart.UpdateSeriesAsync());
+        if (_monthIncomeExpensesChart != null) tasks.Add(_monthIncomeExpensesChart.UpdateSeriesAsync());
+        if (_yearIncomeExpensesChart != null) tasks.Add(_yearIncomeExpensesChart.UpdateSeriesAsync());
+        
         tasks.AddRange(_monthBucketExpensesCharts
             .Select(monthBucketExpensesChart => monthBucketExpensesChart.UpdateSeriesAsync()));
 
         await Task.WhenAll(tasks);
+        StateHasChanged();
     }
 }

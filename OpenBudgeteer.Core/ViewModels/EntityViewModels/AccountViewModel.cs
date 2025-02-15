@@ -5,7 +5,7 @@ using OpenBudgeteer.Core.Data.Entities.Models;
 
 namespace OpenBudgeteer.Core.ViewModels.EntityViewModels;
 
-public class AccountViewModel : BaseEntityViewModel<Account>
+public class AccountViewModel : BaseEntityViewModel<Account>, IEquatable<AccountViewModel>
 {
     #region Properties & Fields
 
@@ -188,5 +188,44 @@ public class AccountViewModel : BaseEntityViewModel<Account>
         }
     }
     
+    #endregion
+
+    #region IEquatable Implementation
+    
+    public bool Equals(AccountViewModel? other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return 
+            AccountId.Equals(other.AccountId) && 
+            _name == other._name && 
+            _isActive == other._isActive && 
+            _balance == other._balance && 
+            _in == other._in && 
+            _out == other._out;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is null) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        if (obj.GetType() != GetType()) return false;
+        return Equals((AccountViewModel)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = new HashCode();
+        hashCode.Add(AccountId);
+        hashCode.Add(_name);
+        hashCode.Add(_isActive);
+        hashCode.Add(_balance);
+        hashCode.Add(_in);
+        hashCode.Add(_out);
+        return hashCode.ToHashCode();
+    }
+
+    public override string ToString() => Name;
+
     #endregion
 }

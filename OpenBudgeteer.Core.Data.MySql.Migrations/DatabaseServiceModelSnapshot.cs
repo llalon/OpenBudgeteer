@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OpenBudgeteer.Core.Data.Entities;
-
+//TODO: Add Migration for DateOnly
 #nullable disable
 
 namespace OpenBudgeteer.Core.Migrations.MySql

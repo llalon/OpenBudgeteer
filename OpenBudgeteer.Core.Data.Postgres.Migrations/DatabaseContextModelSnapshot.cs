@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using OpenBudgeteer.Core.Data.Entities;
 
 #nullable disable
-
+//TODO: Add Migration for DateOnly 
 namespace OpenBudgeteer.Data.Migrations
 {
     [DbContext(typeof(DatabaseContext))]

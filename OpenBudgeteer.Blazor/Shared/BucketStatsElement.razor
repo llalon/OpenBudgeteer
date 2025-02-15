@@ -1,13 +1,11 @@
-<div class="row">
-    <div class="col-md-auto no-gutters">
-        <img src="@ImageUrl" alt=""/>
-    </div>
-    <div class="col" style="text-align: center">
-        <span class="tile-header">@Title</span>
-        <hr class="my-1"/>
-        <span>@Amount</span>
-    </div>
-</div>
+<MudStack Row StretchItems="StretchItems.End">
+    <MudImage Src="@ImageUrl" ObjectFit="ObjectFit.ScaleDown" ObjectPosition="ObjectPosition.Center"/>
+    <MudPaper Class="no-background" Elevation="0">
+        <MudText Align="Align.Center" Style="font-weight: bold">@Title</MudText>
+        <MudDivider Class="my-1"/>
+        <MudText Align="Align.Center">@Amount</MudText>
+    </MudPaper>
+</MudStack>
 
 @code {
     [Parameter] 

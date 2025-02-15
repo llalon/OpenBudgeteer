@@ -1,3 +1,32 @@
+## 1.10 (2025-xx-xx)
+
+### :gear: Features & Enhancements
+
+* Migrated UI to MudBlazor [#287](https://github.com/TheAxelander/OpenBudgeteer/issues/287)
+  * Transaction Page:
+    * Transaction creation is now happening is a separate dialog 
+    * Mass Deletion of Transactions
+    * There are only two modes available: Display Mode and (Mass) Edit Mode
+    * It's no longer possible to change the Amount assigment if no Bucket is selected (displaying the `No Selection` Bucket)
+    * Bucket split is happening automatically based on total assigned Amount
+  * Bucket Page:
+    * Bucket Groups are now managed in a separate Dialog
+    * Bucket Groups will only be displayed once a Bucket has been assigned to it (technical limitation)
+    * Bucket creation now possible via a separate Button (no longer via Bucket Group entry)
+    * For Bucket coloring, a preview is now displayed instead of showing color changes inside the DropDown menus (technical limitation)
+  * Import Page:
+    * New Wizard-like UI for handling the Import process
+    * Column mapping is now restored from the Import Profile in case the Header Row index had to be changed
+  * Misc:
+    * Various table views are now sortable and filterable
+    * Handling of Color themes changed, that also means Bootswatch themes are no longer compatible
+    * New UI to display unexpected Exceptions
+    * Reworked Reconnect message which is now displayed in the App Header
+
+### :x: Removed
+
+* Support for Bootswatch themes
+
 ## 1.9.1 (2025-01-11)
 
 ### :beetle: Bug Fixes

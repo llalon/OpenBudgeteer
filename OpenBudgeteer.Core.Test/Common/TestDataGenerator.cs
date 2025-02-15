@@ -55,11 +55,11 @@ public class TestDataGenerator
     public BankTransaction GenerateBankTransaction(int? seed, Account account)
     {
         var random = seed != null ? new Random((int)seed) : new Random();
-        var date = DateTime.Now.AddDays(GenerateRandomInt(random, 1, 30));
+        var date = DateTime.Today.AddDays(GenerateRandomInt(random, 1, 30));
         return new BankTransaction()
         {
             AccountId = account.Id,
-            TransactionDate = new DateTime(date.Year, date.Month, date.Day),
+            TransactionDate = new DateOnly(date.Year, date.Month, date.Day),
             Payee = GenerateRandomString(random),
             Memo = GenerateRandomString(random),
             Amount = GenerateRandomDecimal(random, 0, 50)
@@ -78,7 +78,7 @@ public class TestDataGenerator
     public Bucket GenerateBucket(int? seed, BucketGroup bucketGroup, BucketVersion bucketVersion)
     {
         var random = seed != null ? new Random((int)seed) : new Random();
-        var date = DateTime.Now.AddDays(GenerateRandomInt(random, 1, 30));
+        var date = DateTime.Today.AddDays(GenerateRandomInt(random, 1, 30));
         var isInactive = Convert.ToBoolean(GenerateRandomInt(random, 0, 1));
         return new Bucket()
         {
@@ -86,9 +86,9 @@ public class TestDataGenerator
             BucketGroupId = bucketGroup.Id,
             ColorCode = GenerateRandomString(random),
             TextColorCode = GenerateRandomString(random),
-            ValidFrom = new DateTime(date.Year, date.Month, date.Day),
+            ValidFrom = new DateOnly(date.Year, date.Month, date.Day),
             IsInactive = isInactive,
-            IsInactiveFrom = isInactive ? new DateTime(date.Year, date.Month, date.Day) : DateTime.MinValue,
+            IsInactiveFrom = isInactive ? new DateOnly(date.Year, date.Month, date.Day) : DateOnly.MinValue,
             BucketVersions = new List<BucketVersion>() { bucketVersion }
         };
     }
@@ -118,12 +118,12 @@ public class TestDataGenerator
     public BucketMovement GenerateBucketMovement(int? seed, Bucket bucket)
     {
         var random = seed != null ? new Random((int)seed) : new Random();
-        var date = DateTime.Now.AddDays(GenerateRandomInt(random, 1, 30));
+        var date = DateTime.Today.AddDays(GenerateRandomInt(random, 1, 30));
         return new BucketMovement()
         {
             BucketId = bucket.Id,
             Amount = GenerateRandomDecimal(random, 0, 50),
-            MovementDate = new DateTime(date.Year, date.Month, date.Day)
+            MovementDate = new DateOnly(date.Year, date.Month, date.Day)
         };
     }
 
@@ -155,16 +155,16 @@ public class TestDataGenerator
     public BucketVersion GenerateBucketVersion(int? seed)
     {
         var random = seed != null ? new Random((int)seed) : new Random();
-        var date = DateTime.Now.AddDays(GenerateRandomInt(random, 1, 30));
+        var date = DateTime.Today.AddDays(GenerateRandomInt(random, 1, 30));
         return new BucketVersion()
         {
             Version = GenerateRandomInt(random, 1, 20),
             BucketType = GenerateRandomInt(random, 1, 4),
             BucketTypeXParam = GenerateRandomInt(random, 1, 50),
             BucketTypeYParam = GenerateRandomDecimal(random, 0, 50),
-            BucketTypeZParam = new DateTime(date.Year, date.Month, date.Day),
+            BucketTypeZParam = new DateOnly(date.Year, date.Month, date.Day),
             Notes = GenerateRandomString(random),
-            ValidFrom = new DateTime(date.Year, date.Month, date.Day)
+            ValidFrom = new DateOnly(date.Year, date.Month, date.Day)
         };
     }
 
@@ -245,13 +245,13 @@ public class TestDataGenerator
     public RecurringBankTransaction GenerateRecurringBankTransaction(int? seed, Account account)
     {
         var random = seed != null ? new Random((int)seed) : new Random();
-        var date = DateTime.Now.AddDays(GenerateRandomInt(random, 1, 30));
+        var date = DateTime.Today.AddDays(GenerateRandomInt(random, 1, 30));
         return new RecurringBankTransaction()
         {
             AccountId = account.Id,
             RecurrenceType = GenerateRandomInt(random, 1, 4),
             RecurrenceAmount = GenerateRandomInt(random, 1, 10),
-            FirstOccurrenceDate = new DateTime(date.Year, date.Month, date.Day),
+            FirstOccurrenceDate = new DateOnly(date.Year, date.Month, date.Day),
             Payee = GenerateRandomString(random),
             Memo = GenerateRandomString(random),
             Amount = GenerateRandomDecimal(random, 0, 50)

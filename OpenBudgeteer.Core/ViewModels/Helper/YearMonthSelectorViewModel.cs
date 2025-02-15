@@ -47,12 +47,12 @@ public class YearMonthSelectorViewModel : ViewModelBase
     /// <summary>
     /// Returns the first day as <see cref="DateTime"/> based on <see cref="SelectedYear"/> and <see cref="SelectedMonth"/>
     /// </summary>
-    public DateTime CurrentMonth => new(SelectedYear, SelectedMonth, 1);
+    public DateOnly CurrentMonth => new(SelectedYear, SelectedMonth, 1);
 
     /// <summary>
     /// Returns the first and last day as <see cref="DateTime"/> based on <see cref="SelectedYear"/> and <see cref="SelectedMonth"/>
     /// </summary>
-    public Tuple<DateTime, DateTime> CurrentPeriod => new(
+    public Tuple<DateOnly, DateOnly> CurrentPeriod => new(
         CurrentMonth,
         CurrentMonth.AddMonths(1).AddDays(-1)
     );
@@ -60,7 +60,7 @@ public class YearMonthSelectorViewModel : ViewModelBase
     /// <summary>
     /// Returns true if today's day is within the currently selected YearMonth 
     /// </summary>
-    public bool IsTodayInCurrentMonth => CurrentMonth.Year == DateTime.Now.Year && CurrentMonth.Month == DateTime.Now.Month;
+    public bool IsTodayInCurrentMonth => CurrentMonth.Year == DateTime.Today.Year && CurrentMonth.Month == DateTime.Today.Month;
 
     /// <summary>
     /// EventHandler which should be invoked once the a year and/or a month has been modified. To be used to trigger
@@ -80,8 +80,8 @@ public class YearMonthSelectorViewModel : ViewModelBase
         {
             Months.Add(i);
         }
-        SelectedMonth = DateTime.Now.Month;
-        SelectedYear = DateTime.Now.Year;
+        SelectedMonth = DateTime.Today.Month;
+        SelectedYear = DateTime.Today.Year;
     }
 
     /// <summary>
@@ -103,11 +103,11 @@ public class YearMonthSelectorViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// Sets the date to the passed <see cref="DateTime"/>
+    /// Sets the date to the passed <see cref="DateOnly"/>
     /// </summary>
     /// <param name="newYearMonth">New date</param>
     /// <remarks>Triggers <see cref="SelectedYearMonthChanged"/> (only once)</remarks>
-    private void UpdateYearMonth(DateTime newYearMonth)
+    private void UpdateYearMonth(DateOnly newYearMonth)
     {
         _yearMonthIsChanging = true;
         SelectedYear = newYearMonth.Year;

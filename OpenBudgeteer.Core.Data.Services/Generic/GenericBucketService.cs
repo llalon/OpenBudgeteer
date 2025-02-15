@@ -31,7 +31,7 @@ public class GenericBucketService : GenericBaseService<Bucket>, IBucketService
     {
         var result = _bucketRepository.ByIdWithVersions(id);
         if (result == null) throw new EntityNotFoundException();
-        result.CurrentVersion = GetLatestVersion(id, DateTime.Now);
+        result.CurrentVersion = GetLatestVersion(id, DateOnly.FromDateTime(DateTime.Today));
         result.BucketVersions = result.BucketVersions!.OrderByDescending(i => i.Version).ToList();
             
         return result;
@@ -66,7 +66,7 @@ public class GenericBucketService : GenericBaseService<Bucket>, IBucketService
             .ToList();
     }
 
-    public IEnumerable<Bucket> GetActiveBuckets(DateTime validFrom)
+    public IEnumerable<Bucket> GetActiveBuckets(DateOnly validFrom)
     {
         var result = _bucketRepository
             .AllWithVersions()
@@ -90,7 +90,7 @@ public class GenericBucketService : GenericBaseService<Bucket>, IBucketService
         return result;
     }
     
-    public BucketVersion GetLatestVersion(Guid bucketId, DateTime yearMonth)
+    public BucketVersion GetLatestVersion(Guid bucketId, DateOnly yearMonth)
     {
         var result = _bucketVersionRepository
             .All()
@@ -102,7 +102,7 @@ public class GenericBucketService : GenericBaseService<Bucket>, IBucketService
         return result;
     }
 
-    public BucketFigures GetFigures(Guid bucketId, DateTime yearMonth)
+    public BucketFigures GetFigures(Guid bucketId, DateOnly yearMonth)
     {
         var bucketWithTransactions = _bucketRepository.ByIdWithTransactions(bucketId) ?? throw new Exception("Bucket not found.");
         var bucketWithMovements = _bucketRepository.ByIdWithMovements(bucketId) ?? throw new Exception("Bucket not found.");
@@ -153,7 +153,7 @@ public class GenericBucketService : GenericBaseService<Bucket>, IBucketService
         return new BucketFigures{ Balance = balance, Input = input, Output = output };
     }
 
-    public decimal GetBalance(Guid bucketId, DateTime yearMonth)
+    public decimal GetBalance(Guid bucketId, DateOnly yearMonth)
     {
         var bucketWithTransactions = _bucketRepository.ByIdWithTransactions(bucketId) ?? throw new Exception("Bucket not found.");
         var bucketWithMovements = _bucketRepository.ByIdWithMovements(bucketId) ?? throw new Exception("Bucket not found.");
@@ -171,7 +171,7 @@ public class GenericBucketService : GenericBaseService<Bucket>, IBucketService
         return result;
     }
 
-    public BucketFigures GetInAndOut(Guid bucketId, DateTime yearMonth)
+    public BucketFigures GetInAndOut(Guid bucketId, DateOnly yearMonth)
     {
         var bucketWithTransactions = _bucketRepository.ByIdWithTransactions(bucketId) ?? throw new Exception("Bucket not found.");
         var bucketWithMovements = _bucketRepository.ByIdWithMovements(bucketId) ?? throw new Exception("Bucket not found.");
@@ -236,7 +236,7 @@ public class GenericBucketService : GenericBaseService<Bucket>, IBucketService
             }
             else
             {
-                var latestVersion = GetLatestVersion(entity.Id, DateTime.Now);
+                var latestVersion = GetLatestVersion(entity.Id, DateOnly.FromDateTime(DateTime.Today));
                 if (entity.CurrentVersion.ValidFrom == latestVersion.ValidFrom)
                 {
                     // Change in same month, overwrite latest Version
@@ -263,7 +263,7 @@ public class GenericBucketService : GenericBaseService<Bucket>, IBucketService
         return entity;
     }
 
-    public void Close(Guid id, DateTime yearMonth)
+    public void Close(Guid id, DateOnly yearMonth)
     {
         if (GetBalance(id, yearMonth) != 0) throw new EntityUpdateException("Balance must be 0 to close a Bucket");
             
@@ -305,7 +305,7 @@ public class GenericBucketService : GenericBaseService<Bucket>, IBucketService
         if (bucketRuleSetIds.Count != 0) _bucketRuleSetRepository.DeleteRange(bucketRuleSetIds);
     }
 
-    public BucketMovement CreateMovement(Guid bucketId, decimal amount, DateTime movementDate)
+    public BucketMovement CreateMovement(Guid bucketId, decimal amount, DateOnly movementDate)
     {
         var newBucketMovement = new BucketMovement()
         {

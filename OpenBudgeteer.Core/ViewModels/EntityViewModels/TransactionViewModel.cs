@@ -11,7 +11,7 @@ using OpenBudgeteer.Core.Data.Entities.Models;
 
 namespace OpenBudgeteer.Core.ViewModels.EntityViewModels;
 
-public class TransactionViewModel : BaseEntityViewModel<BankTransaction>
+public class TransactionViewModel : BaseEntityViewModel<BankTransaction>, IEquatable<TransactionViewModel>
 {
     #region Properties & Fields
     
@@ -30,11 +30,11 @@ public class TransactionViewModel : BaseEntityViewModel<BankTransaction>
         set => Set(ref _selectedAccount, value);
     }
     
-    private DateTime _transactionDate;
+    private DateOnly _transactionDate;
     /// <summary>
     /// Booking Date of the BankTransaction 
     /// </summary>
-    public DateTime TransactionDate 
+    public DateOnly TransactionDate 
     { 
         get => _transactionDate;
         set => Set(ref _transactionDate, value);
@@ -164,7 +164,7 @@ public class TransactionViewModel : BaseEntityViewModel<BankTransaction>
                 Name = "No Account"
             };
             TransactionId = Guid.Empty;
-            _transactionDate = DateTime.Now;
+            _transactionDate = DateOnly.FromDateTime(DateTime.Today);
             _payee = string.Empty;
             _memo = string.Empty;
             _amount = 0;
@@ -295,7 +295,7 @@ public class TransactionViewModel : BaseEntityViewModel<BankTransaction>
             .Select(i => AccountViewModel.CreateFromAccount(serviceManager, i))
             .ToList();
         
-        var currentMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+        var currentMonth = new DateOnly(DateTime.Today.Year, DateTime.Today.Month, 1);
         var availableBuckets = serviceManager.BucketService.GetActiveBuckets(currentMonth).ToList();
         var result = new TransactionViewModel(serviceManager, availableAccounts, availableBuckets, null);
         
@@ -424,6 +424,7 @@ public class TransactionViewModel : BaseEntityViewModel<BankTransaction>
     public void AddBucketItem(decimal amount, PartialBucketViewModel? newBucketItem = null)
     {
         newBucketItem ??= PartialBucketViewModel.CreateNoSelection(ServiceManager);
+        newBucketItem.Amount = amount;
             
         newBucketItem.AmountChanged += CheckBucketAssignments;
         newBucketItem.DeleteAssignmentRequest += DeleteRequestedBucketAssignment;
@@ -437,10 +438,6 @@ public class TransactionViewModel : BaseEntityViewModel<BankTransaction>
     /// <param name="changedArgs">Event Arguments about changed amount</param>
     private void CheckBucketAssignments(object? sender, AmountChangedArgs changedArgs)
     {
-        // Check if this current event was triggered while updating the amount for the "emptyItem"
-        // Prevents Deadlock and StackOverflowException 
-        if (changedArgs.Source.SelectedBucketId == Guid.Empty) return;
-
         // Calculate total amount assigned to any Bucket
         var assignedAmount = Buckets
             // ignore "emptyItem" where existing Bucket is not yet assigned
@@ -448,20 +445,10 @@ public class TransactionViewModel : BaseEntityViewModel<BankTransaction>
             .Where(i => i.SelectedBucketId != Guid.Empty)
             .Sum(i => i.Amount);
 
-        // Consistency check
-        if ((Amount < 0 && assignedAmount > 0) || 
-            (Amount > 0 && assignedAmount < 0) ||
-            // Check over-provisioning of amount assignment
-            (Amount < 0 && Amount - assignedAmount > 0) ||
-            (Amount > 0 && Amount - assignedAmount < 0))
-        {
-            return; // Inconsistency, better to do nothing, Error handling while saving
-        }
-
         // Check if remaining amount left to be assigned to any Bucket
         if (assignedAmount != Amount)
         {
-            if (Buckets.Last().SelectedBucketId != Guid.Empty)
+            if (Buckets.All(i => i.SelectedBucketId != Guid.Empty))
             {
                 // All items have a valid Bucket assignment, create a new "empty item"
                 AddBucketItem(Amount - assignedAmount);
@@ -469,13 +456,16 @@ public class TransactionViewModel : BaseEntityViewModel<BankTransaction>
             else
             {
                 // "emptyItem" exists, update remaining amount to be assigned
-                Buckets.Last().Amount = Amount - assignedAmount;
+                Buckets.First(i => i.SelectedBucketId == Guid.Empty).Amount = Amount - assignedAmount;
             }
         }
-        else if (Buckets.Last().SelectedBucketId == Guid.Empty)
+        else if (Buckets.Any(i => i.SelectedBucketId == Guid.Empty))
         {
-            // Remove unnecessary "empty item" as amount is already assigned properly
-            Buckets.Remove(Buckets.Last());
+            // Remove unnecessary "empty item" objects as amount is already fully assigned
+            foreach (var bucket in Buckets.Where(i => i.SelectedBucketId == Guid.Empty).ToList())
+            {
+                Buckets.Remove(bucket);
+            }
         }
     }
 
@@ -486,11 +476,8 @@ public class TransactionViewModel : BaseEntityViewModel<BankTransaction>
     /// <param name="args">Event Arguments about deletion request</param>
     private void DeleteRequestedBucketAssignment(object? sender, DeleteAssignmentRequestArgs args)
     {
-        // Prevent deletion all last remaining BucketAssignment
-        if (Buckets.Count > 1)
-        {
-            Buckets.Remove(args.Source);
-        }
+        Buckets.Remove(args.Source);
+        CheckBucketAssignments(sender, new AmountChangedArgs(args.Source, 0));
     }
 
     /// <summary>
@@ -672,5 +659,46 @@ public class TransactionViewModel : BaseEntityViewModel<BankTransaction>
         }
     }
     
+    #endregion
+
+    #region IEquatable Implementation
+
+    public bool Equals(TransactionViewModel? other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return 
+            TransactionId.Equals(other.TransactionId) && 
+            _selectedAccount.Equals(other._selectedAccount) && 
+            _transactionDate.Equals(other._transactionDate) && 
+            _payee == other._payee && 
+            _memo == other._memo && 
+            _amount == other._amount && 
+            _buckets.Equals(other._buckets);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is null) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        if (obj.GetType() != GetType()) return false;
+        return Equals((TransactionViewModel)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = new HashCode();
+        hashCode.Add(TransactionId);
+        hashCode.Add(_selectedAccount);
+        hashCode.Add(_transactionDate);
+        hashCode.Add(_payee);
+        hashCode.Add(_memo);
+        hashCode.Add(_amount);
+        hashCode.Add(_buckets);
+        return hashCode.ToHashCode();
+    }
+
+    public override string ToString() => $"{TransactionDate.ToShortDateString()} {Payee} {Memo} {Amount}";
+
     #endregion
 }

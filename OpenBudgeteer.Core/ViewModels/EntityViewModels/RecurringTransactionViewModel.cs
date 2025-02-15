@@ -10,7 +10,7 @@ using OpenBudgeteer.Core.Data.Entities.Models;
 
 namespace OpenBudgeteer.Core.ViewModels.EntityViewModels;
 
-public class RecurringTransactionViewModel : BaseEntityViewModel<RecurringBankTransaction>
+public class RecurringTransactionViewModel : BaseEntityViewModel<RecurringBankTransaction>, IEquatable<RecurringTransactionViewModel>
 {
     #region Properties & Fields
     
@@ -49,11 +49,11 @@ public class RecurringTransactionViewModel : BaseEntityViewModel<RecurringBankTr
         set => Set(ref _recurrenceAmount, value);
     }
     
-    private DateTime _firstOccurrenceDate;
+    private DateOnly _firstOccurrenceDate;
     /// <summary>
     /// Date on which the series starts
     /// </summary>
-    public DateTime FirstOccurrenceDate 
+    public DateOnly FirstOccurrenceDate 
     { 
         get => _firstOccurrenceDate;
         set => Set(ref _firstOccurrenceDate, value);
@@ -150,7 +150,7 @@ public class RecurringTransactionViewModel : BaseEntityViewModel<RecurringBankTr
             _amount = 0;
             _payee = string.Empty;
             _memo = string.Empty;
-            _firstOccurrenceDate = DateTime.Today;
+            _firstOccurrenceDate = DateOnly.FromDateTime(DateTime.Today);
             _recurrenceType = RecurringTransactionRecurrenceType.Weeks;
             _recurrenceAmount = 0;
             
@@ -396,5 +396,49 @@ public class RecurringTransactionViewModel : BaseEntityViewModel<RecurringBankTr
         return result.IsSuccessful ? new ViewModelOperationResult(true, true) : result;
     }
     
+    #endregion
+
+    #region IEquatable Implementation
+
+    public bool Equals(RecurringTransactionViewModel? other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return 
+            RecurringTransactionId.Equals(other.RecurringTransactionId) && 
+            _selectedAccount.Equals(other._selectedAccount) && 
+            _recurrenceType == other._recurrenceType && 
+            _recurrenceAmount == other._recurrenceAmount && 
+            _firstOccurrenceDate.Equals(other._firstOccurrenceDate) && 
+            _payee == other._payee && 
+            _memo == other._memo && 
+            _amount == other._amount;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is null) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        if (obj.GetType() != GetType()) return false;
+        return Equals((RecurringTransactionViewModel)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = new HashCode();
+        hashCode.Add(RecurringTransactionId);
+        hashCode.Add(_selectedAccount);
+        hashCode.Add((int)_recurrenceType);
+        hashCode.Add(_recurrenceAmount);
+        hashCode.Add(_firstOccurrenceDate);
+        hashCode.Add(_payee);
+        hashCode.Add(_memo);
+        hashCode.Add(_amount);
+        return hashCode.ToHashCode();
+    }
+    
+    public override string ToString() => $"Every {RecurrenceAmount} {RecurrenceType.GetStringValue()}: " +
+                                         $"{Payee} {Memo} {Amount}";
+
     #endregion
 }

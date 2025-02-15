@@ -25,13 +25,13 @@ public class GenericBankTransactionService : GenericBaseService<BankTransaction>
         return result;
     }
     
-    public IEnumerable<BankTransaction> GetAll(DateTime? periodStart, DateTime? periodEnd, int limit = 0)
+    public IEnumerable<BankTransaction> GetAll(DateOnly? periodStart, DateOnly? periodEnd, int limit = 0)
     {
         var result = _bankTransactionRepository
             .AllWithIncludedEntities()
             .Where(i =>
-                i.TransactionDate >= (periodStart ?? DateTime.MinValue) &&
-                i.TransactionDate <= (periodEnd ?? DateTime.MaxValue))
+                i.TransactionDate >= (periodStart ?? DateOnly.MinValue) &&
+                i.TransactionDate <= (periodEnd ?? DateOnly.MaxValue))
             .OrderByDescending(i => i.TransactionDate)
             .ToList();
         return limit > 0
@@ -44,13 +44,13 @@ public class GenericBankTransactionService : GenericBaseService<BankTransaction>
         return GetFromAccount(accountId, null, null, limit);
     }
     
-    public IEnumerable<BankTransaction> GetFromAccount(Guid accountId, DateTime? periodStart, DateTime? periodEnd, int limit = 0)
+    public IEnumerable<BankTransaction> GetFromAccount(Guid accountId, DateOnly? periodStart, DateOnly? periodEnd, int limit = 0)
     {
         var result = _bankTransactionRepository
             .AllWithIncludedEntities()
             .Where(i =>
-                i.TransactionDate >= (periodStart ?? DateTime.MinValue) &&
-                i.TransactionDate <= (periodEnd ?? DateTime.MaxValue) &&
+                i.TransactionDate >= (periodStart ?? DateOnly.MinValue) &&
+                i.TransactionDate <= (periodEnd ?? DateOnly.MaxValue) &&
                 i.AccountId == accountId)
             .OrderByDescending(i => i.TransactionDate)
             .ToList();

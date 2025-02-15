@@ -5,15 +5,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MudBlazor.Services;
 using OpenBudgeteer.Blazor;
 using OpenBudgeteer.Core.Common;
 using OpenBudgeteer.Core.Data;
 using OpenBudgeteer.Core.Data.Contracts.Services;
 using OpenBudgeteer.Core.Data.Entities;
-using OpenBudgeteer.Core.Data.Services;
 using OpenBudgeteer.Core.Data.Services.EFCore;
 using OpenBudgeteer.Core.ViewModels.Helper;
-using Tewr.Blazor.FileReader;
 
 const string APPSETTINGS_CULTURE = "APPSETTINGS_CULTURE";
 const string APPSETTINGS_THEME = "APPSETTINGS_THEME";
@@ -25,7 +24,7 @@ builder.Services.AddLocalization();
 builder.Services.AddRazorPages();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
-builder.Services.AddFileReaderService();
+builder.Services.AddMudServices();
 builder.Services.AddHostedService<HostedDatabaseMigrator>();
 builder.Services.AddDatabase(builder.Configuration);
 builder.Services.AddScoped<IServiceManager, EFCoreServiceManager>(x => new EFCoreServiceManager(x.GetRequiredService<DbContextOptions<DatabaseContext>>()));
@@ -45,15 +44,10 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
         
-app.UseRequestLocalization(builder.Configuration.GetValue<string>(APPSETTINGS_CULTURE, "en-US") ?? "en-US");
-AppSettings.Theme = builder.Configuration.GetValue(APPSETTINGS_THEME, "default") ?? "default";
+app.UseRequestLocalization(builder.Configuration.GetValue<string>(APPSETTINGS_CULTURE, "en-US"));
+AppSettings.Theme = builder.Configuration.GetValue(APPSETTINGS_THEME, "default");
 
-//app.UseRouting();
 app.UseAntiforgery();
-/*app.UseEndpoints(endpoints =>
-{
-    endpoints.MapRazorComponents<App>().AddInteractiveServerRenderMode();
-});*/
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 

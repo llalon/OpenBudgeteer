@@ -21,7 +21,7 @@ public class EFCoreBudgetedTransactionService : EFCoreBaseService<BudgetedTransa
         return new GenericBudgetedTransactionService(new BudgetedTransactionRepository(dbContext));
     }
 
-    public IEnumerable<BudgetedTransaction> GetAll(DateTime periodStart, DateTime periodEnd)
+    public IEnumerable<BudgetedTransaction> GetAll(DateOnly periodStart, DateOnly periodEnd)
     {
         try
         {
@@ -38,10 +38,10 @@ public class EFCoreBudgetedTransactionService : EFCoreBaseService<BudgetedTransa
     
     public IEnumerable<BudgetedTransaction> GetAllFromTransaction(Guid transactionId)
     {
-        return GetAllFromTransaction(transactionId, DateTime.MinValue, DateTime.MaxValue);
+        return GetAllFromTransaction(transactionId, DateOnly.MinValue, DateOnly.MaxValue);
     }
     
-    public IEnumerable<BudgetedTransaction> GetAllFromTransaction(Guid transactionId, DateTime periodStart, DateTime periodEnd)
+    public IEnumerable<BudgetedTransaction> GetAllFromTransaction(Guid transactionId, DateOnly periodStart, DateOnly periodEnd)
     {
         try
         {
@@ -58,10 +58,10 @@ public class EFCoreBudgetedTransactionService : EFCoreBaseService<BudgetedTransa
 
     public IEnumerable<BudgetedTransaction> GetAllFromBucket(Guid bucketId)
     {
-        return GetAllFromBucket(bucketId, DateTime.MinValue, DateTime.MaxValue);
+        return GetAllFromBucket(bucketId, DateOnly.MinValue, DateOnly.MaxValue);
     }
     
-    public IEnumerable<BudgetedTransaction> GetAllFromBucket(Guid bucketId, DateTime periodStart, DateTime periodEnd)
+    public IEnumerable<BudgetedTransaction> GetAllFromBucket(Guid bucketId, DateOnly periodStart, DateOnly periodEnd)
     {
         try
         {
@@ -78,10 +78,10 @@ public class EFCoreBudgetedTransactionService : EFCoreBaseService<BudgetedTransa
     
     public IEnumerable<BudgetedTransaction> GetAllNonTransfer()
     {
-        return GetAllNonTransfer(DateTime.MinValue, DateTime.MaxValue);
+        return GetAllNonTransfer(DateOnly.MinValue, DateOnly.MaxValue);
     }
 
-    public IEnumerable<BudgetedTransaction> GetAllNonTransfer(DateTime periodStart, DateTime periodEnd)
+    public IEnumerable<BudgetedTransaction> GetAllNonTransfer(DateOnly periodStart, DateOnly periodEnd)
     {
         try
         {
@@ -98,10 +98,10 @@ public class EFCoreBudgetedTransactionService : EFCoreBaseService<BudgetedTransa
 
     public IEnumerable<BudgetedTransaction> GetAllTransfer()
     {
-        return GetAllTransfer(DateTime.MinValue, DateTime.MaxValue);
+        return GetAllTransfer(DateOnly.MinValue, DateOnly.MaxValue);
     }
 
-    public IEnumerable<BudgetedTransaction> GetAllTransfer(DateTime periodStart, DateTime periodEnd)
+    public IEnumerable<BudgetedTransaction> GetAllTransfer(DateOnly periodStart, DateOnly periodEnd)
     {
         try
         {
@@ -118,10 +118,10 @@ public class EFCoreBudgetedTransactionService : EFCoreBaseService<BudgetedTransa
 
     public IEnumerable<BudgetedTransaction> GetAllIncome()
     {
-        return GetAllIncome(DateTime.MinValue, DateTime.MaxValue);
+        return GetAllIncome(DateOnly.MinValue, DateOnly.MaxValue);
     }
 
-    public IEnumerable<BudgetedTransaction> GetAllIncome(DateTime periodStart, DateTime periodEnd)
+    public IEnumerable<BudgetedTransaction> GetAllIncome(DateOnly periodStart, DateOnly periodEnd)
     {
         try
         {

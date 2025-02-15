@@ -8,7 +8,7 @@ using OpenBudgeteer.Core.Data.Entities.Models;
 
 namespace OpenBudgeteer.Core.ViewModels.EntityViewModels;
 
-public class PartialBucketViewModel : ViewModelBase, ICloneable
+public class PartialBucketViewModel : ViewModelBase, ICloneable, IEquatable<PartialBucketViewModel>
 {
     #region Properties & Fields
     
@@ -81,8 +81,9 @@ public class PartialBucketViewModel : ViewModelBase, ICloneable
         get => _amount;
         set
         {
+            var oldValue = _amount;
             Set(ref _amount, value);
-            AmountChanged?.Invoke(this, new AmountChangedArgs(this, value));
+            if (_amount != oldValue) AmountChanged?.Invoke(this, new AmountChangedArgs(this, value));
         }
     }
 
@@ -205,5 +206,44 @@ public class PartialBucketViewModel : ViewModelBase, ICloneable
         SelectedBucketTextColorCode = bucketViewModel.TextColorCode;
     }
     
+    #endregion
+
+    #region IEquatable Implementation
+
+    public bool Equals(PartialBucketViewModel? other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return 
+            _selectedBucketId.Equals(other._selectedBucketId) && 
+            _selectedBucketName == other._selectedBucketName && 
+            _selectedBucketColorCode == other._selectedBucketColorCode && 
+            _selectedBucketTextColorCode == other._selectedBucketTextColorCode && 
+            _selectedBucketOutput == other._selectedBucketOutput && 
+            _amount == other._amount;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is null) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        if (obj.GetType() != GetType()) return false;
+        return Equals((PartialBucketViewModel)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = new HashCode();
+        hashCode.Add(_selectedBucketId);
+        hashCode.Add(_selectedBucketName);
+        hashCode.Add(_selectedBucketColorCode);
+        hashCode.Add(_selectedBucketTextColorCode);
+        hashCode.Add(_selectedBucketOutput);
+        hashCode.Add(_amount);
+        return hashCode.ToHashCode();
+    }
+
+    public override string ToString() => SelectedBucketOutput;
+
     #endregion
 }

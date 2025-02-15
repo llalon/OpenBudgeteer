@@ -1,29 +1,89 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <UserSecretsId>c146cdfd-f78c-4fb3-8be0-4e15e589371a</UserSecretsId>
     <InvariantGlobalization>false</InvariantGlobalization>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <AssemblyName>OpenBudgeteer</AssemblyName>
     <Nullable>enable</Nullable>
+    <LangVersion>13</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Blazor-ApexCharts" Version="3.2.0" />
+    <PackageReference Include="Blazor-ApexCharts" Version="5.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.5" />
-    <PackageReference Include="Tewr.Blazor.FileReader" Version="3.3.2.23201" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
+    <PackageReference Include="MudBlazor" Version="8.1.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\OpenBudgeteer.Core\OpenBudgeteer.Core.csproj" />
     <ProjectReference Include="..\OpenBudgeteer.Core.Data.MySql.Migrations\OpenBudgeteer.Core.Data.MySql.Migrations.csproj" />
     <ProjectReference Include="..\OpenBudgeteer.Core.Data.Postgres.Migrations\OpenBudgeteer.Core.Data.Postgres.Migrations.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\bootstrap-icons.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\bootstrap-icons.json" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\cerulean\bootstrap.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\cerulean\bootstrap.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\cosmo\bootstrap.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\cosmo\bootstrap.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\cyborg\bootstrap.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\cyborg\bootstrap.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\darkly\bootstrap.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\darkly\bootstrap.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\default\bootstrap.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\default\bootstrap.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\flatly\bootstrap.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\flatly\bootstrap.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\fonts\bootstrap-icons.woff" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\fonts\bootstrap-icons.woff2" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\journal\bootstrap.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\journal\bootstrap.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\litera\bootstrap.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\litera\bootstrap.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\lumen\bootstrap.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\lumen\bootstrap.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\lux\bootstrap.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\lux\bootstrap.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\materia\bootstrap.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\materia\bootstrap.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\minty\bootstrap.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\minty\bootstrap.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\morph\bootstrap.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\morph\bootstrap.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\pulse\bootstrap.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\pulse\bootstrap.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\quartz\bootstrap.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\quartz\bootstrap.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\sandstone\bootstrap.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\sandstone\bootstrap.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\simplex\bootstrap.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\simplex\bootstrap.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\sketchy\bootstrap.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\sketchy\bootstrap.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\slate\bootstrap.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\slate\bootstrap.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\solar\bootstrap.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\solar\bootstrap.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\spacelab\bootstrap.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\spacelab\bootstrap.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\superhero\bootstrap.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\superhero\bootstrap.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\united\bootstrap.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\united\bootstrap.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\vapor\bootstrap.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\vapor\bootstrap.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\yeti\bootstrap.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\yeti\bootstrap.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\zephyr\bootstrap.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\zephyr\bootstrap.min.css" />
   </ItemGroup>
 
 </Project>

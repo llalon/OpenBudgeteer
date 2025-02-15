@@ -219,7 +219,7 @@ public class BucketPageViewModel : BucketListingViewModel
 
             MonthBalance = Income + Expenses;
             BankBalance = ServiceManager.BankTransactionService
-                .GetAll(DateTime.MinValue, YearMonthViewModel.CurrentPeriod.Item2)
+                .GetAll(DateOnly.MinValue, YearMonthViewModel.CurrentPeriod.Item2)
                 .ToList()
                 .Sum(i => i.Amount);
 

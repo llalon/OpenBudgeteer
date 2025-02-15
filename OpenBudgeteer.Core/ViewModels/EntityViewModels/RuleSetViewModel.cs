@@ -9,7 +9,7 @@ using OpenBudgeteer.Core.Data.Entities.Models;
 
 namespace OpenBudgeteer.Core.ViewModels.EntityViewModels;
 
-public class RuleSetViewModel : BaseEntityViewModel<BucketRuleSet>
+public class RuleSetViewModel : BaseEntityViewModel<BucketRuleSet>, IEquatable<RuleSetViewModel>
 {
     #region Properties & Fields
     
@@ -226,7 +226,7 @@ public class RuleSetViewModel : BaseEntityViewModel<BucketRuleSet>
     /// <param name="serviceManager">Reference to API based services</param>
     public static RuleSetViewModel CreateEmpty(IServiceManager serviceManager)
     {
-        var currentYearMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+        var currentYearMonth = new DateOnly(DateTime.Today.Year, DateTime.Today.Month, 1);
         var availableBuckets = serviceManager.BucketService.GetActiveBuckets(currentYearMonth).ToList();
         return new RuleSetViewModel(serviceManager, availableBuckets, null);
     }
@@ -387,7 +387,7 @@ public class RuleSetViewModel : BaseEntityViewModel<BucketRuleSet>
         try
         {
             ServiceManager.BucketRuleSetService.Delete(BucketRuleSetId);
-            return new ViewModelOperationResult(true);
+            return new ViewModelOperationResult(true, true);
         }
         catch (Exception e)
         {
@@ -395,5 +395,48 @@ public class RuleSetViewModel : BaseEntityViewModel<BucketRuleSet>
         }
     }
     
+    #endregion
+
+    #region IEquatable Implementation
+
+    public bool Equals(RuleSetViewModel? other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return 
+            BucketRuleSetId.Equals(other.BucketRuleSetId) && 
+            _priority == other._priority && 
+            _name == other._name && 
+            _targetBucketId.Equals(other._targetBucketId) && 
+            _targetBucketName == other._targetBucketName && 
+            _targetBucketColorCode == other._targetBucketColorCode && 
+            _targetBucketTextColorCode == other._targetBucketTextColorCode && 
+            _mappingRules.Equals(other._mappingRules);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is null) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        if (obj.GetType() != GetType()) return false;
+        return Equals((RuleSetViewModel)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = new HashCode();
+        hashCode.Add(BucketRuleSetId);
+        hashCode.Add(_priority);
+        hashCode.Add(_name);
+        hashCode.Add(_targetBucketId);
+        hashCode.Add(_targetBucketName);
+        hashCode.Add(_targetBucketColorCode);
+        hashCode.Add(_targetBucketTextColorCode);
+        hashCode.Add(_mappingRules);
+        return hashCode.ToHashCode();
+    }
+
+    public override string ToString() => Name;
+
     #endregion
 }

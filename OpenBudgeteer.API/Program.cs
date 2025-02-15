@@ -94,11 +94,11 @@ var bankTransactionService = serviceManager.BankTransactionService;
 transaction.MapGet("{id:guid}", (Guid id) => bankTransactionService.Get(id))
     .MapToApiVersion(1,0)
     .MapToApiVersion(1,1);
-transaction.MapGet("/", (DateTime? start, DateTime? end, int? limit) => 
+transaction.MapGet("/", (DateOnly? start, DateOnly? end, int? limit) => 
         bankTransactionService.GetAll(start, end, limit ?? 0))
     .MapToApiVersion(1,0)
     .MapToApiVersion(1,1);
-transaction.MapGet("/fromAccount/{id:guid}", (Guid id, DateTime? start, DateTime? end, int? limit) => 
+transaction.MapGet("/fromAccount/{id:guid}", (Guid id, DateOnly? start, DateOnly? end, int? limit) => 
         bankTransactionService.GetFromAccount(id, start, end, limit ?? 0))
     .MapToApiVersion(1,0)
     .MapToApiVersion(1,1);
@@ -153,7 +153,7 @@ recurring.MapGet( "/withEntities/{id:guid}", (Guid id) =>
         recurringTransactionService.GetWithEntities(id))
     .MapToApiVersion(1,0)
     .MapToApiVersion(1,1);
-recurring.MapGet("/pendingTransactions", async (DateTime yearMonth) => 
+recurring.MapGet("/pendingTransactions", async (DateOnly yearMonth) => 
         await recurringTransactionService.GetPendingBankTransactionAsync(yearMonth))
     .MapToApiVersion(1,0)
     .MapToApiVersion(1,1);
@@ -163,7 +163,7 @@ recurring.MapPost( "/", (RecurringBankTransaction entity) => recurringTransactio
     .Accepts<RecurringBankTransaction>("application/json")
     .MapToApiVersion(1,0)
     .MapToApiVersion(1,1);
-recurring.MapPost("/pendingTransactions", async (DateTime yearMonth) => 
+recurring.MapPost("/pendingTransactions", async (DateOnly yearMonth) => 
         await recurringTransactionService.CreatePendingBankTransactionAsync(yearMonth))
     .MapToApiVersion(1,0)
     .MapToApiVersion(1,1);
@@ -202,22 +202,22 @@ bucket.MapGet("/withoutSystemBuckets", () => bucketService.GetAllWithoutSystemBu
 bucket.MapGet("/systemBuckets", () => bucketService.GetSystemBuckets())
     .MapToApiVersion(1,0)
     .MapToApiVersion(1,1);
-bucket.MapGet("/activeBuckets", (DateTime? validFrom) => bucketService.GetActiveBuckets(validFrom ?? DateTime.Now))
+bucket.MapGet("/activeBuckets", (DateOnly? validFrom) => bucketService.GetActiveBuckets(validFrom ?? DateOnly.FromDateTime(DateTime.Today)))
     .MapToApiVersion(1,0)
     .MapToApiVersion(1,1);
-bucket.MapGet("/getVersion/{id:guid}", (Guid id, DateTime? yearMonth) => bucketService.GetLatestVersion(id, yearMonth ?? DateTime.Now))
+bucket.MapGet("/getVersion/{id:guid}", (Guid id, DateOnly? yearMonth) => bucketService.GetLatestVersion(id, yearMonth ?? DateOnly.FromDateTime(DateTime.Today)))
     .MapToApiVersion(1,0)
     .MapToApiVersion(1,1);
-bucket.MapGet("/figures/{id:guid}", (Guid id, DateTime? yearMonth) => 
-        bucketService.GetFigures(id, yearMonth ?? new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1)))
+bucket.MapGet("/figures/{id:guid}", (Guid id, DateOnly? yearMonth) => 
+        bucketService.GetFigures(id, yearMonth ?? new DateOnly(DateTime.Today.Year, DateTime.Today.Month, 1)))
     .MapToApiVersion(1,0)
     .MapToApiVersion(1,1);
-bucket.MapGet("/balance/{id:guid}", (Guid id, DateTime? yearMonth) => 
-        bucketService.GetBalance(id, yearMonth ?? new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1)))
+bucket.MapGet("/balance/{id:guid}", (Guid id, DateOnly? yearMonth) => 
+        bucketService.GetBalance(id, yearMonth ?? new DateOnly(DateTime.Today.Year, DateTime.Today.Month, 1)))
     .MapToApiVersion(1,0)
     .MapToApiVersion(1,1);
-bucket.MapGet("/inOut/{id:guid}", (Guid id, DateTime? yearMonth) => 
-        bucketService.GetInAndOut(id, yearMonth ?? new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1)))
+bucket.MapGet("/inOut/{id:guid}", (Guid id, DateOnly? yearMonth) => 
+        bucketService.GetInAndOut(id, yearMonth ?? new DateOnly(DateTime.Today.Year, DateTime.Today.Month, 1)))
     .MapToApiVersion(1,0)
     .MapToApiVersion(1,1);
 
@@ -237,8 +237,8 @@ bucket.MapPatch( "/", (Bucket entity) => bucketService.Update(entity))
 bucket.MapDelete( "/{id:guid}", (Guid id) => bucketService.Delete(id))
     .MapToApiVersion(1,0)
     .MapToApiVersion(1,1);
-bucket.MapDelete( "/close/{id:guid}", (Guid id, DateTime? yearMonth) => 
-        bucketService.Close(id, yearMonth ?? new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1)))
+bucket.MapDelete( "/close/{id:guid}", (Guid id, DateOnly? yearMonth) => 
+        bucketService.Close(id, yearMonth ?? new DateOnly(DateTime.Today.Year, DateTime.Today.Month, 1)))
     .MapToApiVersion(1,0)
     .MapToApiVersion(1,1);
 
@@ -326,12 +326,12 @@ var movementService = serviceManager.BucketMovementService;
 movement.MapGet("{id:guid}", (Guid id) => movementService.Get(id))
     .MapToApiVersion(1,0)
     .MapToApiVersion(1,1);
-movement.MapGet("/", (DateTime? periodStart, DateTime? periodEnd) => 
-        movementService.GetAll(periodStart ?? DateTime.MinValue, periodEnd ?? DateTime.MaxValue))
+movement.MapGet("/", (DateOnly? periodStart, DateOnly? periodEnd) => 
+        movementService.GetAll(periodStart ?? DateOnly.MinValue, periodEnd ?? DateOnly.MaxValue))
     .MapToApiVersion(1,0)
     .MapToApiVersion(1,1);
-movement.MapGet("/fromBucket/{id:guid}", (Guid id, DateTime? periodStart, DateTime? periodEnd) => 
-        movementService.GetAllFromBucket(id, periodStart ?? DateTime.MinValue, periodEnd ?? DateTime.MaxValue))
+movement.MapGet("/fromBucket/{id:guid}", (Guid id, DateOnly? periodStart, DateOnly? periodEnd) => 
+        movementService.GetAllFromBucket(id, periodStart ?? DateOnly.MinValue, periodEnd ?? DateOnly.MaxValue))
     .MapToApiVersion(1,0)
     .MapToApiVersion(1,1);
 

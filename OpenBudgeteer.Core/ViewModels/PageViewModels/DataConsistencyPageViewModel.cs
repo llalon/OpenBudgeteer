@@ -137,9 +137,9 @@ public class DataConsistencyPageViewModel : ViewModelBase
             
             // Check on Transactions which have overall no Bucket assignments
             var unassignedTransactions = ServiceManager.BankTransactionService
-                .GetAll(DateTime.MinValue, DateTime.MaxValue)
+                .GetAll(DateOnly.MinValue, DateOnly.MaxValue)
                 .GroupJoin(
-                    ServiceManager.BudgetedTransactionService.GetAll(DateTime.MinValue, DateTime.MaxValue),
+                    ServiceManager.BudgetedTransactionService.GetAll(DateOnly.MinValue, DateOnly.MaxValue),
                     transaction => transaction.Id,
                     budgetedTransaction => budgetedTransaction.TransactionId,
                     (bankTransaction, budgetedTransactions) => new
@@ -163,7 +163,7 @@ public class DataConsistencyPageViewModel : ViewModelBase
             // Check on incomplete assignments
             var findings = 
                 // Get all BudgetedTransaction which are not 1:1 budgeted (Missing Assignments or Split Transaction) 
-                ServiceManager.BudgetedTransactionService.GetAll(DateTime.MinValue, DateTime.MaxValue)
+                ServiceManager.BudgetedTransactionService.GetAll(DateOnly.MinValue, DateOnly.MaxValue)
                 .Where(i => i.Transaction.Amount != i.Amount)
                 // Grouping results to summarize potential Split Transaction
                 .GroupBy(i => i.TransactionId,
@@ -237,7 +237,7 @@ public class DataConsistencyPageViewModel : ViewModelBase
                 .Select(bucket => Task.Run(() =>
                 {
                     var invalidTransactions = ServiceManager.BudgetedTransactionService
-                        .GetAllFromBucket(bucket.Id, bucket.IsInactiveFrom, DateTime.MaxValue)
+                        .GetAllFromBucket(bucket.Id, bucket.IsInactiveFrom, DateOnly.MaxValue)
                         .ToList();
 
                     results.Add(invalidTransactions.Any()

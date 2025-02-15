@@ -11,7 +11,7 @@ using OpenBudgeteer.Core.Data.Entities.Models;
 
 namespace OpenBudgeteer.Core.ViewModels.EntityViewModels;
 
-public class BucketViewModel : BaseEntityViewModel<Bucket>
+public class BucketViewModel : BaseEntityViewModel<Bucket>, IEquatable<BucketViewModel>
 {
     #region Properties & Fields
     
@@ -50,6 +50,19 @@ public class BucketViewModel : BaseEntityViewModel<Bucket>
         set => Set(ref _selectedBucketGroup, value);
     }
     
+    private BucketGroupViewModel? _bucketGroupViewModel;
+    /// <summary>
+    /// <see cref="EntityViewModels.BucketGroupViewModel"/> to which this Bucket is assigned to
+    /// </summary>
+    /// <remarks>
+    /// Currently only required for MudBlazor Data Grid Grouping
+    /// </remarks>
+    public BucketGroupViewModel? BucketGroupViewModel
+    {
+        get => _bucketGroupViewModel; 
+        set => Set(ref _bucketGroupViewModel, value);
+    }
+    
     private string _colorCode;
     /// <summary>
     /// Name of the color based from <see cref="Color"/> for the Bucket Background
@@ -80,11 +93,11 @@ public class BucketViewModel : BaseEntityViewModel<Bucket>
     /// </summary>
     public Color TextColor => string.IsNullOrEmpty(TextColorCode) ? Color.Black : Color.FromName(TextColorCode);
     
-    private DateTime _validFrom;
+    private DateOnly _validFrom;
     /// <summary>
     /// Date from which this Bucket is valid
     /// </summary>
-    public DateTime ValidFrom 
+    public DateOnly ValidFrom 
     { 
         get => _validFrom;
         set => Set(ref _validFrom, value);
@@ -100,11 +113,11 @@ public class BucketViewModel : BaseEntityViewModel<Bucket>
         set => Set(ref _isInactive, value);
     }
     
-    private DateTime _isInactiveFrom;
+    private DateOnly _isInactiveFrom;
     /// <summary>
     /// Date from which this Bucket started to be in status inactive
     /// </summary>
-    public DateTime IsInactiveFrom 
+    public DateOnly IsInactiveFrom 
     { 
         get => _isInactiveFrom;
         set => Set(ref _isInactiveFrom, value);
@@ -210,7 +223,7 @@ public class BucketViewModel : BaseEntityViewModel<Bucket>
     /// </summary>
     public readonly ObservableCollection<BucketGroup>? AvailableBucketGroups;
 
-    private readonly DateTime _currentYearMonth;
+    private readonly DateOnly _currentYearMonth;
     
     #endregion
     
@@ -223,10 +236,10 @@ public class BucketViewModel : BaseEntityViewModel<Bucket>
     /// <param name="serviceManager">Reference to API based services</param>
     /// <param name="bucket">Bucket instance</param>
     /// <param name="yearMonth">Current month, required for calculating various values</param>
-    protected BucketViewModel(IServiceManager serviceManager, Bucket? bucket, DateTime yearMonth) : base(serviceManager)
+    protected BucketViewModel(IServiceManager serviceManager, Bucket? bucket, DateOnly yearMonth) : base(serviceManager)
     {
         _details = string.Empty;
-        _currentYearMonth = new DateTime(yearMonth.Year, yearMonth.Month, 1);
+        _currentYearMonth = new DateOnly(yearMonth.Year, yearMonth.Month, 1);
         
         if (bucket == null)
         {
@@ -237,7 +250,7 @@ public class BucketViewModel : BaseEntityViewModel<Bucket>
             _textColorCode = Color.Black.Name;
             _validFrom = yearMonth;
             _isInactive = false;
-            _isInactiveFrom = DateTime.MaxValue;
+            _isInactiveFrom = DateOnly.MaxValue;
 
             _bucketVersion = BucketVersionViewModel.CreateEmpty(serviceManager);
             _bucketVersion.BucketTypeDateParameterChanged += CalculateBucketVersionNextApplyingDate;
@@ -246,7 +259,7 @@ public class BucketViewModel : BaseEntityViewModel<Bucket>
         {
             BucketId = bucket.Id;
             _name = bucket.Name ?? string.Empty;
-            _selectedBucketGroup = new BucketGroup() { Id = bucket.BucketGroupId };
+            _selectedBucketGroup = bucket.BucketGroup;
             _colorCode = bucket.ColorCode ?? string.Empty;
             _textColorCode = bucket.TextColorCode ?? string.Empty;
             _validFrom = bucket.ValidFrom;
@@ -276,7 +289,7 @@ public class BucketViewModel : BaseEntityViewModel<Bucket>
         IServiceManager serviceManager,
         IEnumerable<BucketGroup> availableBucketGroups, 
         Bucket? bucket, 
-        DateTime yearMonth) 
+        DateOnly yearMonth) 
         : this(serviceManager, bucket, yearMonth)
     {
         // Collect Available Bucket Groups
@@ -356,7 +369,7 @@ public class BucketViewModel : BaseEntityViewModel<Bucket>
         IServiceManager serviceManager,
         IEnumerable<BucketGroup> availableBucketGroups, 
         Bucket bucket, 
-        DateTime yearMonth)
+        DateOnly yearMonth)
     {
         return await Task.Run(() => new BucketViewModel(serviceManager, availableBucketGroups, bucket, yearMonth));
     }
@@ -371,7 +384,7 @@ public class BucketViewModel : BaseEntityViewModel<Bucket>
     public static BucketViewModel CreateEmpty(
         IServiceManager serviceManager,
         Guid bucketGroupId,
-        DateTime yearMonth)
+        DateOnly yearMonth)
     {
         var availableBucketGroups = serviceManager.BucketGroupService.GetAll().ToList();
         return new BucketViewModel(serviceManager, availableBucketGroups, null, yearMonth)
@@ -390,7 +403,7 @@ public class BucketViewModel : BaseEntityViewModel<Bucket>
     public static BucketViewModel CreateForListing(
         IServiceManager serviceManager,
         Bucket bucket, 
-        DateTime yearMonth)
+        DateOnly yearMonth)
     {
         return new BucketViewModel(serviceManager, bucket, yearMonth);
     }
@@ -405,7 +418,7 @@ public class BucketViewModel : BaseEntityViewModel<Bucket>
     public static async Task<BucketViewModel> CreateForListingAsync(
         IServiceManager serviceManager,
         Bucket bucket, 
-        DateTime yearMonth)
+        DateOnly yearMonth)
     {
         return await Task.Run(() => CreateForListing(serviceManager, bucket, yearMonth));
     }
@@ -488,7 +501,7 @@ public class BucketViewModel : BaseEntityViewModel<Bucket>
             }
         }
 
-        decimal CalculateWant(DateTime targetDate)
+        decimal CalculateWant(DateOnly targetDate)
         {
             var remainingMonths = ((targetDate.Year - _currentYearMonth.Year) * 12) + targetDate.Month - _currentYearMonth.Month;
             if (remainingMonths < 0) return Balance < 0 ? Balance : 0;
@@ -563,7 +576,7 @@ public class BucketViewModel : BaseEntityViewModel<Bucket>
         {
             Id = BucketId,
             Name = Name,
-            BucketGroupId = SelectedBucketGroup!.Id,
+            BucketGroupId = SelectedBucketGroup?.Id ?? Guid.Empty,
             ColorCode = ColorCode,
             TextColorCode = TextColorCode,
             ValidFrom = ValidFrom,
@@ -703,11 +716,11 @@ public class BucketViewModel : BaseEntityViewModel<Bucket>
     {
         try
         {
-            var date = DateTime.Now;
+            var date = DateOnly.FromDateTime(DateTime.Today);
             if (_currentYearMonth.Year != date.Year || _currentYearMonth.Month != date.Month) 
             {
                 var day = (date > _currentYearMonth) ? DateTime.DaysInMonth(_currentYearMonth.Year, _currentYearMonth.Month) : 1;
-                date = new DateTime(_currentYearMonth.Year, _currentYearMonth.Month, day);
+                date = new DateOnly(_currentYearMonth.Year, _currentYearMonth.Month, day);
             }
             ServiceManager.BucketService.CreateMovement(BucketId, InOut, date);
             CalculateValues();
@@ -743,10 +756,57 @@ public class BucketViewModel : BaseEntityViewModel<Bucket>
                 break;
             case BucketVersionViewModel.BucketType.StandardBucket:
             default:
-                BucketVersion.BucketTypeNextDateParameter = DateTime.MinValue;
+                BucketVersion.BucketTypeNextDateParameter = DateOnly.MinValue;
                 break;
         }       
     }
     
+    #endregion
+
+    #region IEquatable Implementation
+
+    public bool Equals(BucketViewModel? other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return 
+            BucketId.Equals(other.BucketId) && 
+            _name == other._name && 
+            _bucketVersion.Equals(other._bucketVersion) && 
+            _selectedBucketGroup?.Id == other._selectedBucketGroup?.Id &&
+            _colorCode == other._colorCode && 
+            _textColorCode == other._textColorCode && 
+            _validFrom.Equals(other._validFrom) && 
+            _isInactive == other._isInactive && 
+            _isInactiveFrom.Equals(other._isInactiveFrom) && 
+            _balance == other._balance;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is null) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        if (obj.GetType() != GetType()) return false;
+        return Equals((BucketViewModel)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = new HashCode();
+        hashCode.Add(BucketId);
+        hashCode.Add(_name);
+        hashCode.Add(_bucketVersion);
+        hashCode.Add(_selectedBucketGroup?.Id);
+        hashCode.Add(_colorCode);
+        hashCode.Add(_textColorCode);
+        hashCode.Add(_validFrom);
+        hashCode.Add(_isInactive);
+        hashCode.Add(_isInactiveFrom);
+        hashCode.Add(_balance);
+        return hashCode.ToHashCode();
+    }
+
+    public override string ToString() => Name;
+
     #endregion
 }
