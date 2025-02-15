@@ -2,11 +2,9 @@
 
 @using System.Globalization
 
-<MudPaper Class="d-flex flex-row flex-wrap no-background" Elevation="0">
-    <MudButton Class="me-2 mb-2" Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" OnClick="@(() => ShowEditAccountDialog(null))">New account</MudButton>
-</MudPaper>
+<MudButton Class="me-2 mb-2" Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" OnClick="@(() => ShowEditAccountDialog(null))">New account</MudButton>
 
-<MudPaper Class="d-flex flex-wrap no-background" Elevation="0">
+<MudElement HtmlTag="div" Class="d-flex flex-wrap no-background">
     @foreach (var account in _dataContext.Accounts)
     {
         <MudCard Class="card-account me-2 mb-2">
@@ -21,4 +19,4 @@
             </MudCardActions>
         </MudCard>
     }
-</MudPaper>
+</MudElement>
