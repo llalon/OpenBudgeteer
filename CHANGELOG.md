@@ -27,6 +27,10 @@
 
 * Support for Bootswatch themes
 
+### :warning: Important notice
+
+* Switched License from MIT to GNU Affero General Public License v3.0
+
 ## 1.9.1 (2025-01-11)
 
 ### :beetle: Bug Fixes
