@@ -157,7 +157,7 @@ public partial class Bucket : ComponentBase
         var dialogOptions = new DialogOptions()
         {
             FullWidth = true,
-            MaxWidth = MaxWidth.Medium
+            MaxWidth = MaxWidth.Large
         };
         await DialogService.ShowAsync<BucketDetailsDialog>("Bucket Details", parameters, dialogOptions);
     }

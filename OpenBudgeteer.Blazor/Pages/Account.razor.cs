@@ -100,7 +100,7 @@ public partial class Account : ComponentBase
         var options = new DialogOptions()
         {
             FullWidth = true,
-            MaxWidth = MaxWidth.Medium
+            MaxWidth = MaxWidth.Large
         };
         await DialogService.ShowAsync<TransactionDialog>("Account", parameters, options);
     }
