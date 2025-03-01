@@ -27,7 +27,7 @@
         <SelectColumn T="RuleSetViewModel" />
         <PropertyColumn Property="x => x.Priority"/>
         <PropertyColumn Property="x => x.Name"/>
-        <PropertyColumn Property="x => x.TargetBucketName">
+        <PropertyColumn Property="x => x.TargetBucketName" Title="Target Bucket">
             <CellTemplate>
                 <MudPaper
                     Class="d-flex align-center justify-center mud-width-full bucket-indicator no-background"
@@ -36,7 +36,7 @@
                 </MudPaper>
             </CellTemplate>
         </PropertyColumn>
-        <PropertyColumn Property="x => x.MappingRules">
+        <PropertyColumn Property="x => x.MappingRules" Title="Mapping Rules">
             <CellTemplate>
                 <MudStack Spacing="0">
                     @foreach (var mappingRule in context.Item.MappingRules)
