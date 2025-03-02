@@ -23,6 +23,7 @@
     * New UI to display unexpected Exceptions
     * Reworked Reconnect message which is now displayed in the App Header
 * Improved database connection handling and logging on application start
+* Add Info Page for database connection details and 3rd party software licenses
 
 ### :x: Removed
 

@@ -6,6 +6,7 @@ namespace OpenBudgeteer.Core.Data.Connection;
 
 public interface IDatabaseConnector<out T> where T : DbConnectionStringBuilder
 {
+    string Provider { get; }
     string Server { get; }
     int Port { get; }
     string Database { get; }

@@ -11,6 +11,7 @@ namespace OpenBudgeteer.Core.Data.Connection;
 
 public abstract class BaseDatabaseConnector<T> : IDatabaseConnector<T> where T : DbConnectionStringBuilder
 {
+    public abstract string Provider { get; }
     public string Server { get; protected set; }
     public int Port { get; protected set; }
     public string Database { get; protected set; }

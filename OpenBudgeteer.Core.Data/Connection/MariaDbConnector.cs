@@ -1,4 +1,5 @@
 using System;
+using System.Data;
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -9,6 +10,8 @@ namespace OpenBudgeteer.Core.Data.Connection;
 
 public partial class MariaDbConnector : BaseDatabaseConnector<MySqlConnectionStringBuilder>
 {
+    public override string Provider => "MariaDB/MySql";
+    
     public MariaDbConnector(IConfiguration configuration) : base(configuration)
     {
         if (string.IsNullOrEmpty(Server)) Server = "localhost";
@@ -71,6 +74,13 @@ public partial class MariaDbConnector : BaseDatabaseConnector<MySqlConnectionStr
             var connectionStringBuilder = useRoot ? BuildRootConnectionString() : BuildConnectionString();
             using var connection = new MySqlConnection(connectionStringBuilder.ConnectionString);
             connection.Open();
+                
+            using var command = new MySqlCommand("SELECT 1");
+            command.Connection = connection;
+            command.CommandType = CommandType.Text;
+
+            command.ExecuteScalar();
+            connection.Close();
             return true;
         }
         catch (Exception e)

@@ -10,6 +10,8 @@ namespace OpenBudgeteer.Core.Data.Connection;
 
 public partial class PostgresConnector : BaseDatabaseConnector<NpgsqlConnectionStringBuilder>
 {
+    public override string Provider => "PostgreSQL";
+    
     public PostgresConnector(IConfiguration configuration) : base(configuration)
     {
         if (string.IsNullOrEmpty(Server)) Server = "localhost";
@@ -74,6 +76,7 @@ public partial class PostgresConnector : BaseDatabaseConnector<NpgsqlConnectionS
             command.CommandType = CommandType.Text;
 
             command.ExecuteScalar();
+            connection.Close();
             return true;
         }
         catch (Exception e)
