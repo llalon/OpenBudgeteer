@@ -16,8 +16,10 @@
             Items="@DataContext.Transactions"
             Dense="true"
             Filterable="true"
+            FixedHeader="true"
             Hover="true"
             ReadOnly="true"
+            RowsPerPage="@PagerSize"
             SortMode="SortMode.Multiple">
             <Columns>
                 <PropertyColumn Property="x => x.TransactionDate" Title="Date">
@@ -38,6 +40,9 @@
                     </CellTemplate>
                 </PropertyColumn>
             </Columns>
+            <PagerContent>
+                <MudDataGridPager T="TransactionViewModel" />
+            </PagerContent>
         </MudDataGrid>
     </DialogContent>
     <DialogActions>
@@ -66,6 +71,8 @@
 
     [Parameter]
     public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
+
+    private int PagerSize { get; set; } = 25;
     
     private void CloseDialog() => MudDialog.Close(DialogResult.Ok(true));
 }
