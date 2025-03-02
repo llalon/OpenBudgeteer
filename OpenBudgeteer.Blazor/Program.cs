@@ -17,7 +17,6 @@ using OpenBudgeteer.Core.ViewModels.Helper;
 const string APPSETTINGS_CULTURE = "APPSETTINGS_CULTURE";
 const string APPSETTINGS_THEME = "APPSETTINGS_THEME";
 
-AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddLocalization();
