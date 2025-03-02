@@ -1,7 +1,9 @@
 using System;
 using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using MySqlConnector;
+using OpenBudgeteer.Core.Data.Entities;
 
 namespace OpenBudgeteer.Core.Data.Connection;
 
@@ -50,6 +52,18 @@ public partial class MariaDbConnector : BaseDatabaseConnector<MySqlConnectionStr
         };
     }
 
+    protected override DbContextOptionsBuilder<DatabaseContext> BuildDbContextOptions()
+    {
+        var builder = new DbContextOptionsBuilder<DatabaseContext>();
+        var connectionStringBuilder = BuildConnectionString();
+        
+        var serverVersion = ServerVersion.AutoDetect(connectionStringBuilder.ConnectionString);
+        return builder.UseMySql(
+            connectionStringBuilder.ConnectionString,
+            serverVersion,
+            b => b.MigrationsAssembly("OpenBudgeteer.Core.Data.MySql.Migrations"));
+    }
+
     public override bool IsDatabaseAccessible(bool useRoot = false)
     {
         try
@@ -65,7 +79,7 @@ public partial class MariaDbConnector : BaseDatabaseConnector<MySqlConnectionStr
             return false;
         }
     }
-    
+
     [GeneratedRegex("^[a-zA-Z][0-9a-zA-Z$_-]{0,63}$", RegexOptions.Compiled | RegexOptions.Singleline)]
     private static partial Regex DatabaseNameRegex();
 }

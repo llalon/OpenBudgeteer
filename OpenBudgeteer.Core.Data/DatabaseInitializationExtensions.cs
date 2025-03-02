@@ -56,10 +56,8 @@ public static class DatabaseInitializationExtensions
         initializer.InitializeDatabase(configuration);
         
         // Register database
-        var dbContextOptions = DbContextOptionsFactory.GetContextOptions(configuration);
-        
         services.AddSingleton(databaseConnector);
-        services.AddSingleton(dbContextOptions);
+        services.AddSingleton(databaseConnector.GetDbContextOptions());
         services.AddScoped(x => new DatabaseContext(x.GetRequiredService<DbContextOptions<DatabaseContext>>()));
     }
 }

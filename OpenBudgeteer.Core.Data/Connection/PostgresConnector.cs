@@ -1,8 +1,10 @@
 using System;
 using System.Data;
 using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
+using OpenBudgeteer.Core.Data.Entities;
 
 namespace OpenBudgeteer.Core.Data.Connection;
 
@@ -49,6 +51,16 @@ public partial class PostgresConnector : BaseDatabaseConnector<NpgsqlConnectionS
         };
     }
 
+    protected override DbContextOptionsBuilder<DatabaseContext> BuildDbContextOptions()
+    {
+        var builder = new DbContextOptionsBuilder<DatabaseContext>();
+        var connectionStringBuilder = BuildConnectionString();
+        
+        return builder.UseNpgsql(
+            connectionStringBuilder.ConnectionString,
+            b => b.MigrationsAssembly("OpenBudgeteer.Core.Data.Postgres.Migrations"));
+    }
+
     public override bool IsDatabaseAccessible(bool useRoot = false)
     {
         try
@@ -70,7 +82,7 @@ public partial class PostgresConnector : BaseDatabaseConnector<NpgsqlConnectionS
             return false;
         }
     }
-    
+
     [GeneratedRegex("^[a-zA-Z][0-9a-zA-Z$_]{0,63}$", RegexOptions.Compiled | RegexOptions.Singleline)]
     private static partial Regex DatabaseNameRegex();
 }

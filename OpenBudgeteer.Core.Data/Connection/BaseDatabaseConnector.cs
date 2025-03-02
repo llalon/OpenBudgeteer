@@ -2,7 +2,10 @@ using System;
 using System.Data.Common;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using OpenBudgeteer.Core.Data.Entities;
 
 namespace OpenBudgeteer.Core.Data.Connection;
 
@@ -27,6 +30,21 @@ public abstract class BaseDatabaseConnector<T> : IDatabaseConnector<T> where T :
 
     public abstract T BuildConnectionString();
     public abstract T BuildRootConnectionString();
+    
+    public virtual DbContextOptions<DatabaseContext> GetDbContextOptions()
+    {
+        var optionsBuilder = BuildDbContextOptions();
+        
+#if DEBUG
+        optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
+        optionsBuilder.EnableSensitiveDataLogging();
+        optionsBuilder.EnableDetailedErrors();
+#endif
+        
+        return optionsBuilder.Options;
+    }
+
+    protected abstract DbContextOptionsBuilder<DatabaseContext> BuildDbContextOptions();
     
     public virtual bool IsDatabaseOnline(int maxAttempts = IDatabaseConnector<T>.MAXIMUM_ATTEMPTS_TO_CONNECT)
     {
