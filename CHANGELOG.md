@@ -22,6 +22,7 @@
     * Handling of Color themes changed, that also means Bootswatch themes are no longer compatible
     * New UI to display unexpected Exceptions
     * Reworked Reconnect message which is now displayed in the App Header
+* Improved database connection handling and logging on application start
 
 ### :x: Removed
 
