@@ -11,7 +11,7 @@ using OpenBudgeteer.Core.Data.Entities.Models;
 
 namespace OpenBudgeteer.Core.ViewModels.EntityViewModels;
 
-public class TransactionViewModel : BaseEntityViewModel<BankTransaction>, IEquatable<TransactionViewModel>
+public class TransactionViewModel : BaseEntityViewModel<BankTransaction>, IEquatable<TransactionViewModel>, IComparable<TransactionViewModel>
 {
     #region Properties & Fields
     
@@ -658,7 +658,7 @@ public class TransactionViewModel : BaseEntityViewModel<BankTransaction>, IEquat
     
     #endregion
 
-    #region IEquatable Implementation
+    #region IEquatable & IComparable Implementation
 
     public bool Equals(TransactionViewModel? other)
     {
@@ -693,6 +693,11 @@ public class TransactionViewModel : BaseEntityViewModel<BankTransaction>, IEquat
         hashCode.Add(_amount);
         hashCode.Add(_buckets);
         return hashCode.ToHashCode();
+    }
+    
+    public int CompareTo(TransactionViewModel? other)
+    {
+        return _transactionDate.CompareTo(other?.TransactionDate);
     }
 
     public override string ToString() => $"{TransactionDate.ToShortDateString()} {Payee} {Memo} {Amount}";

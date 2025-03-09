@@ -5,7 +5,7 @@ using OpenBudgeteer.Core.Data.Entities.Models;
 
 namespace OpenBudgeteer.Core.ViewModels.EntityViewModels;
 
-public class AccountViewModel : BaseEntityViewModel<Account>, IEquatable<AccountViewModel>
+public class AccountViewModel : BaseEntityViewModel<Account>, IEquatable<AccountViewModel>, IComparable<AccountViewModel>
 {
     #region Properties & Fields
 
@@ -190,7 +190,7 @@ public class AccountViewModel : BaseEntityViewModel<Account>, IEquatable<Account
     
     #endregion
 
-    #region IEquatable Implementation
+    #region IEquatable & IComparable Implementation
     
     public bool Equals(AccountViewModel? other)
     {
@@ -223,6 +223,11 @@ public class AccountViewModel : BaseEntityViewModel<Account>, IEquatable<Account
         hashCode.Add(_in);
         hashCode.Add(_out);
         return hashCode.ToHashCode();
+    }
+    
+    public int CompareTo(AccountViewModel? other)
+    {
+        return string.Compare(_name, other?.Name, StringComparison.Ordinal);
     }
 
     public override string ToString() => Name;

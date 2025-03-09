@@ -8,7 +8,7 @@ using OpenBudgeteer.Core.Data.Entities.Models;
 
 namespace OpenBudgeteer.Core.ViewModels.EntityViewModels;
 
-public class PartialBucketViewModel : ViewModelBase, ICloneable, IEquatable<PartialBucketViewModel>
+public class PartialBucketViewModel : ViewModelBase, ICloneable, IEquatable<PartialBucketViewModel>, IComparable<PartialBucketViewModel>
 {
     #region Properties & Fields
     
@@ -170,6 +170,7 @@ public class PartialBucketViewModel : ViewModelBase, ICloneable, IEquatable<Part
         return new PartialBucketViewModel(this);
     }
 
+    
     #endregion
     
     #region Modification Handler
@@ -196,7 +197,7 @@ public class PartialBucketViewModel : ViewModelBase, ICloneable, IEquatable<Part
     
     #endregion
 
-    #region IEquatable Implementation
+    #region IEquatable & IComparable Implementation
 
     public bool Equals(PartialBucketViewModel? other)
     {
@@ -225,6 +226,11 @@ public class PartialBucketViewModel : ViewModelBase, ICloneable, IEquatable<Part
         hashCode.Add(_selectedBucketColorCode);
         hashCode.Add(_selectedBucketTextColorCode);
         return hashCode.ToHashCode();
+    }
+    
+    public int CompareTo(PartialBucketViewModel? other)
+    {
+        return string.Compare(_selectedBucketName, other?.SelectedBucketName, StringComparison.Ordinal);
     }
 
     public override string ToString() => SelectedBucketName;

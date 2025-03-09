@@ -5,7 +5,7 @@ using OpenBudgeteer.Core.Data.Entities.Models;
 
 namespace OpenBudgeteer.Core.ViewModels.EntityViewModels;
 
-public class MappingRuleViewModel : BaseEntityViewModel<MappingRule>, IEquatable<MappingRuleViewModel>
+public class MappingRuleViewModel : BaseEntityViewModel<MappingRule>, IEquatable<MappingRuleViewModel>, IComparable<MappingRuleViewModel>
 {
     #region Properties & Fields
     
@@ -106,7 +106,7 @@ public class MappingRuleViewModel : BaseEntityViewModel<MappingRule>, IEquatable
     
     #endregion
 
-    #region IEquatable Implementation
+    #region IEquatable & IComparable Implementation
 
     public bool Equals(MappingRuleViewModel? other)
     {
@@ -137,6 +137,11 @@ public class MappingRuleViewModel : BaseEntityViewModel<MappingRule>, IEquatable
         hashCode.Add((int)_comparisonType);
         hashCode.Add(_comparisonValue);
         return hashCode.ToHashCode();
+    }
+    
+    public int CompareTo(MappingRuleViewModel? other)
+    {
+        return string.Compare(ToString(), other?.ToString(), StringComparison.Ordinal);
     }
 
     public override string ToString() => $"{ComparisonField.GetStringValue()} " +

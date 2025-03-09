@@ -5,7 +5,7 @@ using OpenBudgeteer.Core.Data.Entities.Models;
 
 namespace OpenBudgeteer.Core.ViewModels.EntityViewModels;
 
-public class BucketVersionViewModel : BaseEntityViewModel<BucketVersion>, IEquatable<BucketVersionViewModel>
+public class BucketVersionViewModel : BaseEntityViewModel<BucketVersion>, IEquatable<BucketVersionViewModel>, IComparable<BucketVersionViewModel>
 {
     #region Properties & Fields
 
@@ -270,7 +270,7 @@ public class BucketVersionViewModel : BaseEntityViewModel<BucketVersion>, IEquat
     
     #endregion
 
-    #region IEquatable Implementation
+    #region IEquatable & IComparable Implementation
 
     public bool Equals(BucketVersionViewModel? other)
     {
@@ -311,6 +311,11 @@ public class BucketVersionViewModel : BaseEntityViewModel<BucketVersion>, IEquat
         hashCode.Add(_bucketTypeNextDateParameter);
         hashCode.Add(_notes);
         return hashCode.ToHashCode();
+    }
+    
+    public int CompareTo(BucketVersionViewModel? other)
+    {
+        return _version.CompareTo(other?.Version);
     }
 
     public override string ToString() => Version.ToString();

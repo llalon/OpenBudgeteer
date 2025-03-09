@@ -10,7 +10,7 @@ using OpenBudgeteer.Core.Data.Entities.Models;
 
 namespace OpenBudgeteer.Core.ViewModels.EntityViewModels;
 
-public class RecurringTransactionViewModel : BaseEntityViewModel<RecurringBankTransaction>, IEquatable<RecurringTransactionViewModel>
+public class RecurringTransactionViewModel : BaseEntityViewModel<RecurringBankTransaction>, IEquatable<RecurringTransactionViewModel>, IComparable<RecurringTransactionViewModel>
 {
     #region Properties & Fields
     
@@ -398,7 +398,7 @@ public class RecurringTransactionViewModel : BaseEntityViewModel<RecurringBankTr
     
     #endregion
 
-    #region IEquatable Implementation
+    #region IEquatable & IComparable Implementation
 
     public bool Equals(RecurringTransactionViewModel? other)
     {
@@ -435,6 +435,11 @@ public class RecurringTransactionViewModel : BaseEntityViewModel<RecurringBankTr
         hashCode.Add(_memo);
         hashCode.Add(_amount);
         return hashCode.ToHashCode();
+    }
+    
+    public int CompareTo(RecurringTransactionViewModel? other)
+    {
+        return string.Compare(ToString(), other?.ToString(), StringComparison.Ordinal);
     }
     
     public override string ToString() => $"Every {RecurrenceAmount} {RecurrenceType.GetStringValue()}: " +

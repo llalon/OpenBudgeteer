@@ -6,7 +6,7 @@ using OpenBudgeteer.Core.Data.Entities.Models;
 
 namespace OpenBudgeteer.Core.ViewModels.EntityViewModels;
 
-public class BucketGroupViewModel : BaseEntityViewModel<BucketGroup>, IEquatable<BucketGroupViewModel>
+public class BucketGroupViewModel : BaseEntityViewModel<BucketGroup>, IEquatable<BucketGroupViewModel>, IComparable<BucketGroupViewModel>
 {
     #region Properties & Fields
     
@@ -321,7 +321,7 @@ public class BucketGroupViewModel : BaseEntityViewModel<BucketGroup>, IEquatable
     
     #endregion
 
-    #region IEquatable Implementation
+    #region IEquatable & IComparable Implementation
 
     public bool Equals(BucketGroupViewModel? other)
     {
@@ -356,6 +356,11 @@ public class BucketGroupViewModel : BaseEntityViewModel<BucketGroup>, IEquatable
         hashCode.Add(_totalIn);
         hashCode.Add(_totalActivity);
         return hashCode.ToHashCode();
+    }
+    
+    public int CompareTo(BucketGroupViewModel? other)
+    {
+        return string.Compare(_name, other?.Name, StringComparison.Ordinal);
     }
     
     public override string ToString() => Name;

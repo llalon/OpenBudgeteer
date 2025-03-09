@@ -5,7 +5,7 @@ using OpenBudgeteer.Core.Data.Entities.Models;
 
 namespace OpenBudgeteer.Core.ViewModels.EntityViewModels;
 
-public class ImportProfileViewModel : BaseEntityViewModel<ImportProfile>, IEquatable<ImportProfileViewModel>
+public class ImportProfileViewModel : BaseEntityViewModel<ImportProfile>, IEquatable<ImportProfileViewModel>, IComparable<ImportProfileViewModel>
 {
     #region Properties & Fields
     
@@ -432,7 +432,7 @@ public class ImportProfileViewModel : BaseEntityViewModel<ImportProfile>, IEquat
     
     #endregion
 
-    #region IEquatable Implementation
+    #region IEquatable & IComparable Implementation
     
     public bool Equals(ImportProfileViewModel? other)
     {
@@ -489,6 +489,11 @@ public class ImportProfileViewModel : BaseEntityViewModel<ImportProfile>, IEquat
         hashCode.Add(_additionalSettingAmountCleanup);
         hashCode.Add(_additionalSettingAmountCleanupValue);
         return hashCode.ToHashCode();
+    }
+    
+    public int CompareTo(ImportProfileViewModel? other)
+    {
+        return string.Compare(_profileName, other?.ProfileName, StringComparison.Ordinal);
     }
 
     public override string ToString() => ProfileName;

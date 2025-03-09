@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing;
 using System.Linq;
 using OpenBudgeteer.Core.Common;
 using OpenBudgeteer.Core.Data.Contracts.Services;
@@ -9,7 +8,7 @@ using OpenBudgeteer.Core.Data.Entities.Models;
 
 namespace OpenBudgeteer.Core.ViewModels.EntityViewModels;
 
-public class RuleSetViewModel : BaseEntityViewModel<BucketRuleSet>, IEquatable<RuleSetViewModel>
+public class RuleSetViewModel : BaseEntityViewModel<BucketRuleSet>, IEquatable<RuleSetViewModel>, IComparable<RuleSetViewModel>
 {
     #region Properties & Fields
     
@@ -336,7 +335,7 @@ public class RuleSetViewModel : BaseEntityViewModel<BucketRuleSet>, IEquatable<R
     
     #endregion
 
-    #region IEquatable Implementation
+    #region IEquatable & IComparable Implementation
 
     public bool Equals(RuleSetViewModel? other)
     {
@@ -367,6 +366,11 @@ public class RuleSetViewModel : BaseEntityViewModel<BucketRuleSet>, IEquatable<R
         hashCode.Add(TargetBucket);
         hashCode.Add(_mappingRules);
         return hashCode.ToHashCode();
+    }
+    
+    public int CompareTo(RuleSetViewModel? other)
+    {
+        return string.Compare(_name, other?.Name, StringComparison.Ordinal);
     }
 
     public override string ToString() => Name;
