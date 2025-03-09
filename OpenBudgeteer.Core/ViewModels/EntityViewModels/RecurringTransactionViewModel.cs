@@ -137,7 +137,7 @@ public class RecurringTransactionViewModel : BaseEntityViewModel<RecurringBankTr
         }
         
         // Handle Transaction
-        if (transaction == null)
+        if (transaction is null)
         {
             // Add the "No Account" for pre-selection
             var noAccount = new Account
@@ -332,7 +332,7 @@ public class RecurringTransactionViewModel : BaseEntityViewModel<RecurringBankTr
     {
         // Consistency and Validity Checks
         if (RecurrenceAmount == 0) return new ViewModelOperationResult(false, "Invalid Recurrence details.");
-        //if (Transaction == null) return new ViewModelOperationResult(false, "Errors in Transaction object.");
+        //if (Transaction is null) return new ViewModelOperationResult(false, "Errors in Transaction object.");
         if (SelectedAccount.AccountId == Guid.Empty) return new ViewModelOperationResult(false, "No Bank account selected.");
         if (!SelectedAccount.IsActive) return new ViewModelOperationResult(false, "The selected Bank account is inactive.");
         
@@ -372,7 +372,7 @@ public class RecurringTransactionViewModel : BaseEntityViewModel<RecurringBankTr
     /// </summary>
     public void CancelModification()
     {
-        if (_oldRecurringTransactionViewModelItem != null)
+        if (_oldRecurringTransactionViewModelItem is not null)
         {
             SelectedAccount = _oldRecurringTransactionViewModelItem.SelectedAccount;
             RecurrenceType = _oldRecurringTransactionViewModelItem.RecurrenceType;

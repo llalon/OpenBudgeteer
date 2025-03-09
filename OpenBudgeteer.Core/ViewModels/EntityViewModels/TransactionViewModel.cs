@@ -136,7 +136,7 @@ public class TransactionViewModel : BaseEntityViewModel<BankTransaction>, IEquat
         AvailableAccounts = new ObservableCollection<AccountViewModel>();
         
         // Handle Accounts
-        if (availableAccounts != null)
+        if (availableAccounts is not null)
         {
             foreach (var availableAccount in availableAccounts)
             {
@@ -145,7 +145,7 @@ public class TransactionViewModel : BaseEntityViewModel<BankTransaction>, IEquat
         }
         
         // Handle Buckets
-        if (availableBuckets != null)
+        if (availableBuckets is not null)
         {
             foreach (var availableBucket in availableBuckets)
             {
@@ -154,7 +154,7 @@ public class TransactionViewModel : BaseEntityViewModel<BankTransaction>, IEquat
         }
 
         // Handle Transaction
-        if (transaction == null)
+        if (transaction is null)
         {
             // Add the "No Account" for pre-selection
             var noAccount = new Account
@@ -174,7 +174,7 @@ public class TransactionViewModel : BaseEntityViewModel<BankTransaction>, IEquat
             AvailableAccounts.Add(_selectedAccount);
             
             // Create an empty Bucket Assignment if requested (required for "Create new Transaction")
-            if (availableBuckets != null)
+            if (availableBuckets is not null)
             {
                 var emptyBucket = PartialBucketViewModel.CreateNoSelection(serviceManager);
                 emptyBucket.AmountChanged += CheckBucketAssignments;
@@ -200,7 +200,7 @@ public class TransactionViewModel : BaseEntityViewModel<BankTransaction>, IEquat
             }
             
             // Handle Buckets
-            if (availableBuckets == null) return;
+            if (availableBuckets is null) return;
                 
             // Get all assigned Buckets for this transaction
             var budgetedTransactions = serviceManager.BudgetedTransactionService
@@ -582,7 +582,7 @@ public class TransactionViewModel : BaseEntityViewModel<BankTransaction>, IEquat
 
     public void CancelModification()
     {
-        if (_oldTransactionViewModelItem == null) return;
+        if (_oldTransactionViewModelItem is null) return;
         
         SelectedAccount = _oldTransactionViewModelItem.SelectedAccount;
         TransactionDate = _oldTransactionViewModelItem.TransactionDate;
@@ -605,7 +605,7 @@ public class TransactionViewModel : BaseEntityViewModel<BankTransaction>, IEquat
     public void ProposeBucket()
     {
         var proposal = CheckMappingRules();
-        if (proposal == null) return;
+        if (proposal is null) return;
         Buckets.Clear();
         Buckets.Add(PartialBucketViewModel.CreateFromBucket(
             ServiceManager, 

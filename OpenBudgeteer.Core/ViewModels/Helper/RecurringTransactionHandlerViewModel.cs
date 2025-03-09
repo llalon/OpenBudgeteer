@@ -84,7 +84,7 @@ public class RecurringTransactionHandlerViewModel : ViewModelBase
     {
         try
         {
-            if (_newRecurringTransaction == null) throw new Exception("New Recurring Transaction has not been initialized");
+            if (_newRecurringTransaction is null) throw new Exception("New Recurring Transaction has not been initialized");
             var result = _newRecurringTransaction.CreateOrUpdateTransaction();
             if (!result.IsSuccessful) return result;
             ResetNewTransaction();

@@ -2,6 +2,7 @@
 @using OpenBudgeteer.Blazor.Common
 @using OpenBudgeteer.Blazor.ViewModels
 @using System.Globalization
+@using OpenBudgeteer.Blazor.Common.CustomMudFilter
 @using OpenBudgeteer.Core.Common
 @using OpenBudgeteer.Core.ViewModels.EntityViewModels
 @using Color = MudBlazor.Color
@@ -21,18 +22,50 @@
                     Dense="true"
                     Elevation="0"
                     Filterable="true"
+                    FilterMode="DataGridFilterMode.ColumnFilterMenu"
+                    FixedHeader="true"
                     Hover="true"
-                    ReadOnly="true">
+                    ReadOnly="true"
+                    RowsPerPage="@PagerSize">
                     <Columns>
                         <PropertyColumn Property="x => x.TransactionDate" Title="Date">
-                            <CellTemplate>
-                                <MudText>@context.Item.TransactionDate.ToShortDateString()</MudText>
-                            </CellTemplate>
+                            <FilterTemplate>
+                                <MudGrid Spacing="6" Style="width:430px">
+                                    <MudItem xs="12">
+                                        <MudDateRangePicker
+                                            PickerVariant="PickerVariant.Inline"
+                                            @bind-DateRange="@_dateOnlyMudFilter.DateRange"
+                                            Margin="Margin.Dense"/>
+                                    </MudItem>
+                                    <MudItem xs="12" Class="d-flex justify-end">
+                                        <MudButton OnClick="@(() => _dateOnlyMudFilter.ResetFilterOnContextAsync(context))">Clear</MudButton>
+                                        <MudButton Color="@Color.Primary" OnClick="@(() => _dateOnlyMudFilter.ApplyFilterOnContextAsync(context))">Filter</MudButton>
+                                    </MudItem>
+                                </MudGrid>
+                            </FilterTemplate>
                         </PropertyColumn>
                         <PropertyColumn Property="x => x.SelectedAccount" Title="Account" CellStyle="min-width: 150px">
-                            <CellTemplate>
-                                <MudText>@context.Item.SelectedAccount.Name</MudText>
-                            </CellTemplate>
+                            <FilterTemplate>
+                                <MudGrid Spacing="6" Style="width:430px">
+                                    <MudItem xs="12">
+                                        <MudSelect
+                                            T="AccountViewModel"
+                                            @bind-SelectedValues="_accountMudFilter.SelectedItems"
+                                            MultiSelection="true"
+                                            MultiSelectionTextFunc="@(items => MultiSelectionTextHelper.GetText(items, "Accounts"))"
+                                            SelectAll="true">
+                                            @foreach (var account in _accountMudFilter.AvailableItems)
+                                            {
+                                                <MudSelectItem Value="account">@account</MudSelectItem>
+                                            }
+                                        </MudSelect>
+                                    </MudItem>
+                                    <MudItem xs="12" Class="d-flex justify-end">
+                                        <MudButton OnClick="@(() => _accountMudFilter.ResetFilterOnContextAsync(context))">Clear</MudButton>
+                                        <MudButton Color="@Color.Primary" OnClick="@(() => _accountMudFilter.ApplyFilterOnContextAsync(context))">Filter</MudButton>
+                                    </MudItem>
+                                </MudGrid>
+                            </FilterTemplate>
                         </PropertyColumn>
                         <PropertyColumn Property="x => x.Payee"/>
                         <PropertyColumn Property="x => x.Memo"/>
@@ -47,8 +80,32 @@
                                     <MudText Class="col-numbers">@context.Item.Buckets.Where(b => b.SelectedBucketId == DataContext.BucketId).Sum(b => b.Amount).ToString("C", CultureInfo.CurrentCulture)*</MudText>
                                 }
                             </CellTemplate>
+                            <FilterTemplate>
+                                <MudGrid Spacing="6" Style="width:430px">
+                                    <MudItem xs="12">
+                                        <MudSelect
+                                            T="PartialBucketViewModel"
+                                            @bind-SelectedValues="_bucketMudFilter.SelectedItems"
+                                            MultiSelection="true"
+                                            MultiSelectionTextFunc="@(items => MultiSelectionTextHelper.GetText(items, "Buckets"))"
+                                            SelectAll="true">
+                                            @foreach (var account in _bucketMudFilter.AvailableItems)
+                                            {
+                                                <MudSelectItem Value="account">@account</MudSelectItem>
+                                            }
+                                        </MudSelect>
+                                    </MudItem>
+                                    <MudItem xs="12" Class="d-flex justify-end">
+                                        <MudButton OnClick="@(() => _bucketMudFilter.ResetFilterOnContextAsync(context))">Clear</MudButton>
+                                        <MudButton Color="@Color.Primary" OnClick="@(() => _bucketMudFilter.ApplyFilterOnContextAsync(context))">Filter</MudButton>
+                                    </MudItem>
+                                </MudGrid>
+                            </FilterTemplate>
                         </PropertyColumn>
                     </Columns>
+                    <PagerContent>
+                        <MudDataGridPager T="TransactionViewModel" />
+                    </PagerContent>
                 </MudDataGrid>
             </MudTabPanel>
             <MudTabPanel Text="Statistics">
@@ -146,6 +203,12 @@
 
     [Parameter]
     public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
+    
+    private DateOnlyMudFilter<TransactionViewModel> _dateOnlyMudFilter;
+    private EntityViewModelMudFilter<AccountViewModel, TransactionViewModel> _accountMudFilter;
+    private EntityViewModelMudFilter<PartialBucketViewModel, TransactionViewModel> _bucketMudFilter;
+    
+    private int PagerSize { get; set; } = 25;
 
     private ApexChart<ReportRecord>? _monthBalanceChart;
     private ApexChart<ReportRecord>? _monthInputOutputChart;
@@ -164,17 +227,55 @@
     };
 
     private void CloseDialog() => MudDialog.Close(DialogResult.Ok(true));
+    
+    protected override void OnInitialized()
+    {
+        _accountMudFilter = new(new()
+        {
+            FilterFunction = x => _accountMudFilter.FilterItems.Contains(x.SelectedAccount)
+        });
+        _dateOnlyMudFilter = new(new()
+        {
+            FilterFunction = x => 
+                x.TransactionDate.IsBetween(_dateOnlyMudFilter.DateRange.Start, _dateOnlyMudFilter.DateRange.End)
+        });
+        _bucketMudFilter = new(new()
+        {
+            FilterFunction = x => x.Buckets.Any(bucket => _bucketMudFilter.FilterItems.Contains(bucket))
+        });
+        
+        ResetFilter();
+    }
+
+    private void ResetFilter()
+    {
+        _accountMudFilter.AvailableItems = DataContext.BucketMovementsData.Transactions
+            .Select(i => i.SelectedAccount)
+            .Distinct()
+            .OrderBy(i => i.Name)
+            .ToList();
+        _bucketMudFilter.AvailableItems = DataContext.BucketMovementsData.Transactions
+            .SelectMany(i => i.Buckets)
+            .DistinctBy(i => i.SelectedBucketId)
+            .OrderBy(i => i.SelectedBucketName)
+            .ToList();
+        
+        _accountMudFilter.ResetFilter();
+        _dateOnlyMudFilter.ResetFilter();
+        _bucketMudFilter.ResetFilter();
+    }
 
     private async Task IncludeBucketMovementCheckboxChanged(bool obj)
     {
         IncludeBucketMovements = obj;
         await DataContext.LoadBucketMovementsDataAsync(IncludeBucketMovements);
+        ResetFilter();
         StateHasChanged();
-        var tasks = new List<Task>();
-        if (_monthBalanceChart != null) tasks.Add(_monthBalanceChart.UpdateSeriesAsync());
-        if (_monthInputOutputChart != null) tasks.Add(_monthInputOutputChart.UpdateSeriesAsync());
-        if (_bucketProgressionChart != null) tasks.Add(_bucketProgressionChart.UpdateSeriesAsync());
         
+        var tasks = new List<Task>();
+        if (_monthBalanceChart is not null) tasks.Add(_monthBalanceChart.UpdateSeriesAsync());
+        if (_monthInputOutputChart is not null) tasks.Add(_monthInputOutputChart.UpdateSeriesAsync());
+        if (_bucketProgressionChart is not null) tasks.Add(_bucketProgressionChart.UpdateSeriesAsync());
         await Task.WhenAll(tasks);
     }
 }

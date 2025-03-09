@@ -130,7 +130,7 @@ public class BucketGroupViewModel : BaseEntityViewModel<BucketGroup>, IEquatable
         _inModification = false;
         _currentMonth = currentMonth;
 
-        if (bucketGroup == null)
+        if (bucketGroup is null)
         {
             BucketGroupId = Guid.Empty;
             _name = "New Bucket Group";
@@ -207,7 +207,7 @@ public class BucketGroupViewModel : BaseEntityViewModel<BucketGroup>, IEquatable
     /// </summary>
     public void CancelModification()
     {
-        if (_oldBucketGroup == null) return;
+        if (_oldBucketGroup is null) return;
         Name = _oldBucketGroup.Name;
         Position = _oldBucketGroup.Position;
         InModification = false;

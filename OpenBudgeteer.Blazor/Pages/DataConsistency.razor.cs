@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using OpenBudgeteer.Blazor.Shared;
+using OpenBudgeteer.Blazor.Shared.Dialog;
 using OpenBudgeteer.Core.Common;
 using OpenBudgeteer.Core.Data.Contracts.Services;
 using OpenBudgeteer.Core.ViewModels.PageViewModels;

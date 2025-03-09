@@ -1,5 +1,7 @@
 ﻿@page "/rules"
 @using System.Drawing
+@using OpenBudgeteer.Blazor.Common
+@using OpenBudgeteer.Core.Common.Extensions
 @using OpenBudgeteer.Core.ViewModels.EntityViewModels
 @using Color = MudBlazor.Color
 @using Size = MudBlazor.Size
@@ -18,6 +20,8 @@
     Dense="true"
     EditMode="DataGridEditMode.Form"
     Filterable="true"
+    FilterMode="DataGridFilterMode.ColumnFilterMenu"
+    FixedHeader="true"
     Hover="true"
     MultiSelection="true"
     ReadOnly="true"
@@ -27,14 +31,35 @@
         <SelectColumn T="RuleSetViewModel" />
         <PropertyColumn Property="x => x.Priority"/>
         <PropertyColumn Property="x => x.Name"/>
-        <PropertyColumn Property="x => x.TargetBucketName" Title="Target Bucket">
+        <PropertyColumn Property="x => x.TargetBucket.Name" Title="Target Bucket">
             <CellTemplate>
                 <MudPaper
                     Class="d-flex align-center justify-center mud-width-full bucket-indicator no-background"
-                    Style="@($"background-color: {ColorTranslator.ToHtml(context.Item.TargetBucketColor)}; color: {ColorTranslator.ToHtml(context.Item.TargetBucketTextColor)}")">
-                    <MudText>@context.Item.TargetBucketName</MudText>
+                    Style="@($"background-color: {ColorTranslator.ToHtml(context.Item.TargetBucket.Color)}; color: {ColorTranslator.ToHtml(context.Item.TargetBucket.TextColor)}")">
+                    <MudText>@context.Item.TargetBucket.Name</MudText>
                 </MudPaper>
             </CellTemplate>
+            <FilterTemplate>
+                <MudGrid Spacing="6" Style="width:430px">
+                    <MudItem xs="12">
+                        <MudSelect
+                            T="BucketViewModel"
+                            @bind-SelectedValues="_bucketMudFilter.SelectedItems"
+                            MultiSelection="true"
+                            MultiSelectionTextFunc="@(items => MultiSelectionTextHelper.GetText(items, "Buckets"))"
+                            SelectAll="true">
+                            @foreach (var partialBucket in _bucketMudFilter.AvailableItems)
+                            {
+                                <MudSelectItem Value="partialBucket">@partialBucket</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" Class="d-flex justify-end">
+                        <MudButton OnClick="@(() => _bucketMudFilter.ResetFilterOnContextAsync(context))">Clear</MudButton>
+                        <MudButton Color="@Color.Primary" OnClick="@(() => _bucketMudFilter.ApplyFilterOnContextAsync(context))">Filter</MudButton>
+                    </MudItem>
+                </MudGrid>
+            </FilterTemplate>
         </PropertyColumn>
         <PropertyColumn Property="x => x.MappingRules" Title="Mapping Rules">
             <CellTemplate>
@@ -45,6 +70,25 @@
                     }
                 </MudStack>
             </CellTemplate>
+            <FilterTemplate>
+                <MudGrid Spacing="6" Style="width:430px">
+                    <MudItem xs="12">
+                        <MudSelect T="MappingRuleComparisonField" @bind-Value="_mappingRuleMudFilter.SelectedComparisonField" Label="Comparision Field">
+                            @foreach (var comparisonField in _mappingRuleMudFilter.AvailableComparisonFields)
+                            {
+                                <MudSelectItem Value="comparisonField">@comparisonField</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="_mappingRuleMudFilter.ComparisionValue" Label="Comparison Value"/>
+                    </MudItem>
+                    <MudItem xs="12" Class="d-flex justify-end">
+                        <MudButton OnClick="@(() => _mappingRuleMudFilter.ResetFilterOnContextAsync(context))">Clear</MudButton>
+                        <MudButton Color="@Color.Primary" OnClick="@(() => _mappingRuleMudFilter.ApplyFilterOnContextAsync(context))">Filter</MudButton>
+                    </MudItem>
+                </MudGrid>
+            </FilterTemplate>
         </PropertyColumn>
         <TemplateColumn>
             <CellTemplate>

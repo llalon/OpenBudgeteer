@@ -6,11 +6,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
+using OpenBudgeteer.Blazor.Common;
+using OpenBudgeteer.Blazor.Common.CustomMudFilter;
 using OpenBudgeteer.Blazor.Common.InputLargeTextArea;
-using OpenBudgeteer.Blazor.Shared;
+using OpenBudgeteer.Blazor.Shared.Dialog;
 using OpenBudgeteer.Core.Common;
 using OpenBudgeteer.Core.Data.Contracts.Services;
 using OpenBudgeteer.Core.ViewModels.PageViewModels;
+using TinyCsvParser.Mapping;
 
 namespace OpenBudgeteer.Blazor.Pages;
 
@@ -52,6 +55,10 @@ public partial class Import : ComponentBase
     private enum MaxStepLevel { Step1, Step2, Step3, Step4 }
     private MaxStepLevel _maxStepLevel = MaxStepLevel.Step1;
     private int _stepperIndex;
+    
+    private DateOnlyMudFilter<CsvMappingResult<ParsedBankTransaction>> _validRecordsDateOnlyMudFilter;
+    private DateOnlyMudFilter<ImportPageViewModel.Duplicate> _duplicateRecordsDateOnlyMudFilter;
+    private CsvMappingErrorMudFilter<CsvMappingResult<ParsedBankTransaction>> _errorRecordsMudFilter;
 
     private bool _isValidationRunning;
     private bool _isImportRunning;
@@ -61,6 +68,25 @@ public partial class Import : ComponentBase
     protected override async Task OnInitializedAsync()
     {
         _dataContext = new ImportPageViewModel(ServiceManager);
+        _validRecordsDateOnlyMudFilter = new(new()
+        {
+            FilterFunction = x => 
+                DateOnly.FromDateTime(x.Result.TransactionDate).IsBetween(
+                    _validRecordsDateOnlyMudFilter.DateRange.Start, 
+                    _validRecordsDateOnlyMudFilter.DateRange.End)
+        });
+        _duplicateRecordsDateOnlyMudFilter = new(new()
+        {
+            FilterFunction = x => 
+                DateOnly.FromDateTime(x.ParsedBankTransaction.Result.TransactionDate).IsBetween(
+                    _duplicateRecordsDateOnlyMudFilter.DateRange.Start, 
+                    _duplicateRecordsDateOnlyMudFilter.DateRange.End)
+        });
+        _errorRecordsMudFilter = new(new()
+        {
+            FilterFunction = x => 
+                _errorRecordsMudFilter.FilterItems.Contains(new EquatableCsvMappingError(x.Error))
+        });
         
         await LoadData();
     }
@@ -91,7 +117,7 @@ public partial class Import : ComponentBase
     
     private async Task UploadFile(IBrowserFile? file)
     {
-        if (file == null)
+        if (file is null)
         {
             _selectedFileName = null;
             return;
@@ -146,7 +172,7 @@ public partial class Import : ComponentBase
     {
         _dataContext.ResetLoadFigures();
 
-        if (_dataContext.SelectedImportProfile != null && _dataContext.IdentifiedColumns.Any())
+        if (_dataContext.SelectedImportProfile is not null && _dataContext.IdentifiedColumns.Any())
         {
             _maxStepLevel = MaxStepLevel.Step3;
             CheckColumnMapping(); // Checks on Step 4
@@ -242,6 +268,12 @@ public partial class Import : ComponentBase
         _isValidationRunning = true;
         await SyncPreviewTextToViewModelFileTextAsync(); // Required if PreviewTextArea has not yet lost focus
         _validationErrorMessage = (await _dataContext.ValidateDataAsync()).Message;
+        _errorRecordsMudFilter.AvailableItems = _dataContext.ParsedRecords
+            .Where(i => !i.IsValid)
+            .Select(i => new EquatableCsvMappingError(i.Error))
+            .Distinct()
+            .ToList();
+        _errorRecordsMudFilter.ResetFilter();
         _isValidationRunning = false;
     }
 
@@ -277,8 +309,8 @@ public partial class Import : ComponentBase
     {
         _dataContext = new ImportPageViewModel(ServiceManager);
         await LoadData();
-        if (_fileUpload != null) await _fileUpload.ClearAsync();
-        if (_stepper != null) await _stepper.ResetAsync();
+        if (_fileUpload is not null) await _fileUpload.ClearAsync();
+        if (_stepper is not null) await _stepper.ResetAsync();
         _stepperIndex = 0;
         await SyncViewModelFileTextToPreviewTextAsync();
         StateHasChanged();

@@ -1,6 +1,7 @@
 ﻿@page "/transaction"
 @using System.Drawing
 @using System.Globalization
+@using OpenBudgeteer.Blazor.Common
 @using OpenBudgeteer.Core.Common.Extensions
 @using OpenBudgeteer.Core.ViewModels.EntityViewModels
 @using Color = MudBlazor.Color
@@ -24,12 +25,8 @@
                 <MudButton Class="me-2 mb-2" Variant="Variant.Filled" Size="Size.Small" Color="Color.Error" OnClick="DeleteSelectedTransactions">Delete @_selectedTransactions.Count Selected</MudButton>
             }
             <MudButton Class="me-2 mb-2" Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" OnClick="ProposeBucketsAsync">Propose Buckets</MudButton>
-            <MudButtonGroup Class="me-2 mb-2" Color="Color.Primary" Variant="Variant.Filled" Size="Size.Small">
-                <MudButton OnClick="AddRecurringTransactions">Add Recurring Transactions</MudButton>
-                <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown" Style="align-self: auto;">
-                    <MudMenuItem OnClick="ShowRecurringTransactionDialog">Manage</MudMenuItem>
-                </MudMenu>
-            </MudButtonGroup>
+            <MudButton Class="me-2 mb-2" Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" OnClick="AddRecurringTransactions">Add Recurring Transactions</MudButton>
+            <MudButton Class="me-2 mb-2" Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" OnClick="ShowRecurringTransactionDialog">Manage Recurring Transactions</MudButton>
         </MudStack>
         <MudStack Row Spacing="3" AlignItems="AlignItems.Center">
             <YearMonthSelector Class="mb-2" DataContext="YearMonthDataContext"/>
@@ -37,39 +34,70 @@
     }
 </MudStack>
 
-<MudDataGrid 
+<MudDataGrid
     T="TransactionViewModel"
     Items="@_dataContext.Transactions"
     Dense="true"
     EditMode="DataGridEditMode.Cell"
     Filterable="true"
+    FilterMode="DataGridFilterMode.ColumnFilterMenu"
+    FixedHeader="true"
     Hover="true"
     MultiSelection="true"
     ReadOnly="@(!_massEditEnabled)"
     SortMode="SortMode.Multiple"
     SelectedItemsChanged="Transactions_SelectionChanged">
     <Columns>
-        <SelectColumn T="TransactionViewModel" />
+        <SelectColumn T="TransactionViewModel"/>
         <PropertyColumn Property="x => x.TransactionDate" Title="Date">
-            <CellTemplate>
-                <MudText>@context.Item.TransactionDate.ToShortDateString()</MudText>
-            </CellTemplate>
             <EditTemplate>
                 <MudDatePicker Date="@(context.Item.TransactionDate.ToDateTime(TimeOnly.MinValue))" DateChanged="@(time => TransactionDateChanged(time, context.Item))" ShowToolbar="false"/>
             </EditTemplate>
+            <FilterTemplate>
+                <MudGrid Spacing="6" Style="width:430px">
+                    <MudItem xs="12">
+                        <MudDateRangePicker 
+                            PickerVariant="PickerVariant.Inline" 
+                            @bind-DateRange="@_dateOnlyMudFilter.DateRange" 
+                            Margin="Margin.Dense"/>
+                    </MudItem>
+                    <MudItem xs="12" Class="d-flex justify-end">
+                        <MudButton OnClick="@(() => _dateOnlyMudFilter.ResetFilterOnContextAsync(context))">Clear</MudButton>
+                        <MudButton Color="@Color.Primary" OnClick="@(() => _dateOnlyMudFilter.ApplyFilterOnContextAsync(context))">Filter</MudButton>
+                    </MudItem>
+                </MudGrid>
+            </FilterTemplate>
         </PropertyColumn>
         <PropertyColumn Property="x => x.SelectedAccount" Title="Account" CellStyle="min-width: 150px">
-            <CellTemplate>
-                <MudText>@context.Item.SelectedAccount.Name</MudText>
-            </CellTemplate>
             <EditTemplate>
-                <MudSelect T="AccountViewModel" @bind-Value="context.Item.SelectedAccount" ToStringFunc="@_convertAccount">
+                <MudSelect T="AccountViewModel" @bind-Value="context.Item.SelectedAccount">
                     @foreach (var account in context.Item.AvailableAccounts)
                     {
                         <MudSelectItem Value="@account">@account.Name</MudSelectItem>
                     }
                 </MudSelect>
             </EditTemplate>
+            <FilterTemplate>
+                <MudGrid Spacing="6" Style="width:430px">
+                    <MudItem xs="12">
+                        <MudSelect
+                            T="AccountViewModel"
+                            @bind-SelectedValues="_accountMudFilter.SelectedItems"
+                            MultiSelection="true"
+                            MultiSelectionTextFunc="@(items => MultiSelectionTextHelper.GetText(items, "Accounts"))"
+                            SelectAll="true">
+                            @foreach (var account in _accountMudFilter.AvailableItems)
+                            {
+                                <MudSelectItem Value="account">@account</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" Class="d-flex justify-end">
+                        <MudButton OnClick="@(() => _accountMudFilter.ResetFilterOnContextAsync(context))">Clear</MudButton>
+                        <MudButton Color="@Color.Primary" OnClick="@(() => _accountMudFilter.ApplyFilterOnContextAsync(context))">Filter</MudButton>
+                    </MudItem>
+                </MudGrid>
+            </FilterTemplate>
         </PropertyColumn>
         <PropertyColumn Property="x => x.Payee"/>
         <PropertyColumn Property="x => x.Memo"/>
@@ -102,7 +130,7 @@
                             <MudItem xs="6" Class="d-flex align-center">
                                 <MudButton
                                     Size="Size.Small"
-                                    Class="mud-width-full bucket-indicator" 
+                                    Class="mud-width-full bucket-indicator"
                                     Style="@($"background-color: {ColorTranslator.ToHtml(bucket.SelectedBucketColor)}; color: {ColorTranslator.ToHtml(bucket.SelectedBucketTextColor)}")"
                                     OnClick="@(() => ShowBucketSelectDialog(context.Item, bucket))">
                                     @bucket.SelectedBucketName
@@ -133,6 +161,27 @@
                     }
                 </MudStack>
             </EditTemplate>
+            <FilterTemplate>
+                <MudGrid Spacing="6" Style="width:430px">
+                    <MudItem xs="12">
+                        <MudSelect
+                            T="PartialBucketViewModel"
+                            @bind-SelectedValues="_bucketMudFilter.SelectedItems"
+                            MultiSelection="true"
+                            MultiSelectionTextFunc="@(items => MultiSelectionTextHelper.GetText(items, "Buckets"))"
+                            SelectAll="true">
+                            @foreach (var partialBucket in _bucketMudFilter.AvailableItems)
+                            {
+                                <MudSelectItem Value="partialBucket">@partialBucket</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" Class="d-flex justify-end">
+                        <MudButton OnClick="@(() => _bucketMudFilter.ResetFilterOnContextAsync(context))">Clear</MudButton>
+                        <MudButton Color="@Color.Primary" OnClick="@(() => _bucketMudFilter.ApplyFilterOnContextAsync(context))">Filter</MudButton>
+                    </MudItem>
+                </MudGrid>
+            </FilterTemplate>
         </PropertyColumn>
     </Columns>
 </MudDataGrid>

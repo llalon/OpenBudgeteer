@@ -114,7 +114,7 @@ public class PartialBucketViewModel : ViewModelBase, ICloneable, IEquatable<Part
         _selectedBucketOutput = string.Empty;
         _amount = amount;
 
-        if (bucket == null)
+        if (bucket is null)
         {
             // Create a "No Selection" Bucket
             var noSelectionBucket = new Bucket()
@@ -214,13 +214,11 @@ public class PartialBucketViewModel : ViewModelBase, ICloneable, IEquatable<Part
     {
         if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
-        return 
-            _selectedBucketId.Equals(other._selectedBucketId) && 
-            _selectedBucketName == other._selectedBucketName && 
-            _selectedBucketColorCode == other._selectedBucketColorCode && 
-            _selectedBucketTextColorCode == other._selectedBucketTextColorCode && 
-            _selectedBucketOutput == other._selectedBucketOutput && 
-            _amount == other._amount;
+        return
+            _selectedBucketId.Equals(other._selectedBucketId) &&
+            _selectedBucketName == other._selectedBucketName &&
+            _selectedBucketColorCode == other._selectedBucketColorCode &&
+            _selectedBucketTextColorCode == other._selectedBucketTextColorCode;
     }
 
     public override bool Equals(object? obj)
@@ -238,8 +236,6 @@ public class PartialBucketViewModel : ViewModelBase, ICloneable, IEquatable<Part
         hashCode.Add(_selectedBucketName);
         hashCode.Add(_selectedBucketColorCode);
         hashCode.Add(_selectedBucketTextColorCode);
-        hashCode.Add(_selectedBucketOutput);
-        hashCode.Add(_amount);
         return hashCode.ToHashCode();
     }
 

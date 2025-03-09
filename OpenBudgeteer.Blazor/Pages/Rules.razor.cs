@@ -3,8 +3,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using OpenBudgeteer.Blazor.Shared;
+using OpenBudgeteer.Blazor.Common.CustomMudFilter;
+using OpenBudgeteer.Blazor.Shared.Dialog;
 using OpenBudgeteer.Core.Common;
+using OpenBudgeteer.Core.Common.Extensions;
 using OpenBudgeteer.Core.Data.Contracts.Services;
 using OpenBudgeteer.Core.ViewModels.EntityViewModels;
 using OpenBudgeteer.Core.ViewModels.PageViewModels;
@@ -18,13 +20,49 @@ public partial class Rules : ComponentBase
 
     private RulesPageViewModel _dataContext = null!;
     
+    private EntityViewModelMudFilter<BucketViewModel, RuleSetViewModel> _bucketMudFilter;
+    private MappingRuleMudFilter<RuleSetViewModel> _mappingRuleMudFilter;
+    
     private HashSet<RuleSetViewModel> _selectedRuleSets = new();
 
     protected override async Task OnInitializedAsync()
     {
         _dataContext = new RulesPageViewModel(ServiceManager);
-
         await HandleResult(await _dataContext.LoadDataAsync());
+        
+        _bucketMudFilter = new(new()
+        {
+            FilterFunction = x => _bucketMudFilter.FilterItems.Contains(x.TargetBucket)
+        });
+        _mappingRuleMudFilter = new(new()
+        {
+            FilterFunction = x =>
+            {
+                if (_mappingRuleMudFilter.SelectedComparisonField == MappingRuleComparisonField.Any &&
+                    string.IsNullOrEmpty(_mappingRuleMudFilter.ComparisionValue)) return true;
+                if (_mappingRuleMudFilter.SelectedComparisonField == MappingRuleComparisonField.Any )
+                {
+                    return x.MappingRules.Any(i => 
+                        i.ComparisonValue == _mappingRuleMudFilter.ComparisionValue);    
+                }
+                if (string.IsNullOrEmpty(_mappingRuleMudFilter.ComparisionValue))
+                {
+                    return x.MappingRules.Any(i =>
+                        i.ComparisonField == _mappingRuleMudFilter.SelectedComparisonField);
+                }
+                return x.MappingRules.Any(i =>
+                    i.ComparisonField == _mappingRuleMudFilter.SelectedComparisonField &&
+                    i.ComparisonValue == _mappingRuleMudFilter.ComparisionValue);
+            }
+        });
+        _bucketMudFilter.AvailableItems = _dataContext.RuleSets
+            .Select(i => i.TargetBucket)
+            .Distinct()
+            .OrderBy(i => i.Name)
+            .ToList();
+        
+        _bucketMudFilter.ResetFilter();
+        _mappingRuleMudFilter.ResetFilter();
     }
 
     private void RuleSet_SelectionChanged(HashSet<RuleSetViewModel> items)
@@ -63,11 +101,11 @@ public partial class Rules : ComponentBase
         var dialogDataContext = ruleSet ?? RuleSetViewModel.CreateEmpty(ServiceManager); 
         var parameters = new DialogParameters<EditRuleSetDialog>
         {
-            { x => x.Title, ruleSet == null ? "Create Rule" : "Edit Rule" },
+            { x => x.Title, ruleSet is null ? "Create Rule" : "Edit Rule" },
             { x => x.DataContext, dialogDataContext }
         };
         var dialog = await DialogService.ShowAsync<EditRuleSetDialog>(
-            ruleSet == null ? "Create Rule" : "Edit Rule", parameters);
+            ruleSet is null ? "Create Rule" : "Edit Rule", parameters);
         var dialogResult = await dialog.Result;
         if (dialogResult is { Canceled: false })
         {

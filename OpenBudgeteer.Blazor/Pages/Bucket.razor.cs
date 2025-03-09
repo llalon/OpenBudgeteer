@@ -1,10 +1,9 @@
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
-using OpenBudgeteer.Blazor.Shared;
+using OpenBudgeteer.Blazor.Shared.Dialog;
 using OpenBudgeteer.Blazor.ViewModels;
 using OpenBudgeteer.Core.Common;
 using OpenBudgeteer.Core.Data.Contracts.Services;

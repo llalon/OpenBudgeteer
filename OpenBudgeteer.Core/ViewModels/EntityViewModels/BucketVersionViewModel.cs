@@ -169,7 +169,7 @@ public class BucketVersionViewModel : BaseEntityViewModel<BucketVersion>, IEquat
     /// <param name="bucketVersion">BucketVersion instance</param>
     protected BucketVersionViewModel(IServiceManager serviceManager, BucketVersion? bucketVersion) : base(serviceManager)
     {
-        if (bucketVersion == null)
+        if (bucketVersion is null)
         {
             BucketVersionId = Guid.Empty;
             _version = 0;

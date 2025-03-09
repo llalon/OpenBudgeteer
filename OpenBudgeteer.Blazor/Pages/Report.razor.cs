@@ -53,10 +53,10 @@ public partial class Report : ComponentBase
         _monthBucketExpensesConfigsRight.AddRange(_apexContext.MonthBucketExpenses.GetRange(halfIndex,_apexContext.MonthBucketExpenses.Count - halfIndex));
         
         var tasks = new List<Task>();
-        if (_monthBalanceChart != null) tasks.Add(_monthBalanceChart.UpdateSeriesAsync());
-        if (_bankBalanceChart != null) tasks.Add(_bankBalanceChart.UpdateSeriesAsync());
-        if (_monthIncomeExpensesChart != null) tasks.Add(_monthIncomeExpensesChart.UpdateSeriesAsync());
-        if (_yearIncomeExpensesChart != null) tasks.Add(_yearIncomeExpensesChart.UpdateSeriesAsync());
+        if (_monthBalanceChart is not null) tasks.Add(_monthBalanceChart.UpdateSeriesAsync());
+        if (_bankBalanceChart is not null) tasks.Add(_bankBalanceChart.UpdateSeriesAsync());
+        if (_monthIncomeExpensesChart is not null) tasks.Add(_monthIncomeExpensesChart.UpdateSeriesAsync());
+        if (_yearIncomeExpensesChart is not null) tasks.Add(_yearIncomeExpensesChart.UpdateSeriesAsync());
         
         tasks.AddRange(_monthBucketExpensesCharts
             .Select(monthBucketExpensesChart => monthBucketExpensesChart.UpdateSeriesAsync()));

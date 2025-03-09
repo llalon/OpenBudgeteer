@@ -1,6 +1,7 @@
 ﻿@page "/import"
 @using OpenBudgeteer.Core.ViewModels.EntityViewModels
 @using System.Globalization
+@using OpenBudgeteer.Blazor.Common
 @using OpenBudgeteer.Blazor.Common.InputLargeTextArea
 @using OpenBudgeteer.Core.Common
 @using OpenBudgeteer.Core.Common.Extensions
@@ -13,7 +14,7 @@
             <MudFileUpload T="IBrowserFile" @ref="_fileUpload" FilesChanged="UploadFile">
                 <ActivatorContent>
                     <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" StartIcon="@Icons.Material.Filled.CloudUpload">Open File</MudButton>
-                    @if (_selectedFileName != null)
+                    @if (_selectedFileName is not null)
                     {
                         <MudChip T="string" Class="ms-2" Color="Color.Dark" Text="@_selectedFileName"/>
                     }
@@ -33,7 +34,7 @@
                             <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" OnClick="CreateProfile">Create Profile</MudButton>
                             <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" OnClick="SaveProfile">Save Profile</MudButton>
                         }
-                        @if (_dataContext.SelectedImportProfile != null)
+                        @if (_dataContext.SelectedImportProfile is not null)
                         {
                             <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Error" OnClick="DeleteProfile">Delete Profile</MudButton>
                         }
@@ -213,6 +214,7 @@
                         Items="_dataContext.ParsedRecords.Where(i => i.IsValid)"
                         Dense="true"
                         Filterable="true"
+                        FilterMode="DataGridFilterMode.ColumnFilterMenu"
                         Hover="true"
                         ReadOnly="true"
                         SortMode="SortMode.Multiple">
@@ -221,6 +223,20 @@
                                 <CellTemplate>
                                     <MudText>@context.Item.Result.TransactionDate.ToShortDateString()</MudText>
                                 </CellTemplate>
+                                <FilterTemplate>
+                                    <MudGrid Spacing="6" Style="width:430px">
+                                        <MudItem xs="12">
+                                            <MudDateRangePicker
+                                                PickerVariant="PickerVariant.Inline"
+                                                @bind-DateRange="@_validRecordsDateOnlyMudFilter.DateRange"
+                                                Margin="Margin.Dense"/>
+                                        </MudItem>
+                                        <MudItem xs="12" Class="d-flex justify-end">
+                                            <MudButton OnClick="@(() => _validRecordsDateOnlyMudFilter.ResetFilterOnContextAsync(context))">Clear</MudButton>
+                                            <MudButton Color="@Color.Primary" OnClick="@(() => _validRecordsDateOnlyMudFilter.ApplyFilterOnContextAsync(context))">Filter</MudButton>
+                                        </MudItem>
+                                    </MudGrid>
+                                </FilterTemplate>
                             </PropertyColumn>
                             <PropertyColumn Property="x => x.Result.Payee"/>
                             <PropertyColumn Property="x => x.Result.Memo"/>
@@ -241,11 +257,12 @@
                         Items="_dataContext.ParsedRecords.Where(i => !i.IsValid)"
                         Dense="true"
                         Filterable="true"
+                        FilterMode="DataGridFilterMode.ColumnFilterMenu"
                         Hover="true"
                         ReadOnly="true"
                         SortMode="SortMode.Multiple">
                         <Columns>
-                            <PropertyColumn Property="x => x.RowIndex" Title="Row" CellClass="col-numbers" CellStyle="width:50px"/>
+                            <PropertyColumn Property="x => x.RowIndex" Title="Row" CellClass="col-numbers" CellStyle="width:50px" Filterable="false"/>
                             <PropertyColumn Property="x => x.Error" Title="Details">
                                 <CellTemplate>
                                     <MudStack>
@@ -253,6 +270,27 @@
                                         <MudText>@context.Item.Error.UnmappedRow</MudText>
                                     </MudStack>
                                 </CellTemplate>
+                                <FilterTemplate>
+                                    <MudGrid Spacing="6" Style="width:430px">
+                                        <MudItem xs="12">
+                                            <MudSelect
+                                                T="EquatableCsvMappingError"
+                                                @bind-SelectedValues="_errorRecordsMudFilter.SelectedItems"
+                                                MultiSelection="true"
+                                                MultiSelectionTextFunc="@(items => MultiSelectionTextHelper.GetText(items, "Errors"))"
+                                                SelectAll="true">
+                                                @foreach (var csvMappingError in _errorRecordsMudFilter.AvailableItems)
+                                                {
+                                                    <MudSelectItem Value="csvMappingError">@csvMappingError.Value</MudSelectItem>
+                                                }
+                                            </MudSelect>
+                                        </MudItem>
+                                        <MudItem xs="12" Class="d-flex justify-end">
+                                            <MudButton OnClick="@(() => _errorRecordsMudFilter.ResetFilterOnContextAsync(context))">Clear</MudButton>
+                                            <MudButton Color="@Color.Primary" OnClick="@(() => _errorRecordsMudFilter.ApplyFilterOnContextAsync(context))">Filter</MudButton>
+                                        </MudItem>
+                                    </MudGrid>
+                                </FilterTemplate>
                             </PropertyColumn>
                         </Columns>
                     </MudDataGrid>
@@ -266,6 +304,7 @@
                         Items="_dataContext.Duplicates"
                         Dense="true"
                         Filterable="true"
+                        FilterMode="DataGridFilterMode.ColumnFilterMenu"
                         Hover="true"
                         ReadOnly="true"
                         SortMode="SortMode.Multiple">
@@ -280,6 +319,20 @@
                                         }
                                     </MudStack>
                                 </CellTemplate>
+                                <FilterTemplate>
+                                    <MudGrid Spacing="6" Style="width:430px">
+                                        <MudItem xs="12">
+                                            <MudDateRangePicker
+                                                PickerVariant="PickerVariant.Inline"
+                                                @bind-DateRange="@_duplicateRecordsDateOnlyMudFilter.DateRange"
+                                                Margin="Margin.Dense"/>
+                                        </MudItem>
+                                        <MudItem xs="12" Class="d-flex justify-end">
+                                            <MudButton OnClick="@(() => _duplicateRecordsDateOnlyMudFilter.ResetFilterOnContextAsync(context))">Clear</MudButton>
+                                            <MudButton Color="@Color.Primary" OnClick="@(() => _duplicateRecordsDateOnlyMudFilter.ApplyFilterOnContextAsync(context))">Filter</MudButton>
+                                        </MudItem>
+                                    </MudGrid>
+                                </FilterTemplate>
                             </PropertyColumn>
                             <PropertyColumn Property="x => x.ParsedBankTransaction.Result.Payee">
                                 <CellTemplate>

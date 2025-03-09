@@ -38,7 +38,7 @@ public class TestDataGenerator
     
     public Account GenerateAccount(int? seed)
     {
-        var random = seed != null ? new Random((int)seed) : new Random();
+        var random = seed is not null ? new Random((int)seed) : new Random();
         return new Account()
         {
             Name = GenerateRandomString(random),
@@ -54,7 +54,7 @@ public class TestDataGenerator
     
     public BankTransaction GenerateBankTransaction(int? seed, Account account)
     {
-        var random = seed != null ? new Random((int)seed) : new Random();
+        var random = seed is not null ? new Random((int)seed) : new Random();
         var date = DateTime.Today.AddDays(GenerateRandomInt(random, 1, 30));
         return new BankTransaction()
         {
@@ -77,7 +77,7 @@ public class TestDataGenerator
     
     public Bucket GenerateBucket(int? seed, BucketGroup bucketGroup, BucketVersion bucketVersion)
     {
-        var random = seed != null ? new Random((int)seed) : new Random();
+        var random = seed is not null ? new Random((int)seed) : new Random();
         var date = DateTime.Today.AddDays(GenerateRandomInt(random, 1, 30));
         var isInactive = Convert.ToBoolean(GenerateRandomInt(random, 0, 1));
         return new Bucket()
@@ -101,7 +101,7 @@ public class TestDataGenerator
     
     public BucketGroup GenerateBucketGroup(int? seed)
     {
-        var random = seed != null ? new Random((int)seed) : new Random();
+        var random = seed is not null ? new Random((int)seed) : new Random();
         return new BucketGroup()
         {
             Name = GenerateRandomString(random),
@@ -117,7 +117,7 @@ public class TestDataGenerator
     
     public BucketMovement GenerateBucketMovement(int? seed, Bucket bucket)
     {
-        var random = seed != null ? new Random((int)seed) : new Random();
+        var random = seed is not null ? new Random((int)seed) : new Random();
         var date = DateTime.Today.AddDays(GenerateRandomInt(random, 1, 30));
         return new BucketMovement()
         {
@@ -135,7 +135,7 @@ public class TestDataGenerator
     
     public BucketRuleSet GenerateBucketRuleSet(int? seed, Bucket bucket)
     {
-        var random = seed != null ? new Random((int)seed) : new Random();
+        var random = seed is not null ? new Random((int)seed) : new Random();
         return new BucketRuleSet()
         {
             Priority = GenerateRandomInt(random, 1, 100),
@@ -154,7 +154,7 @@ public class TestDataGenerator
     
     public BucketVersion GenerateBucketVersion(int? seed)
     {
-        var random = seed != null ? new Random((int)seed) : new Random();
+        var random = seed is not null ? new Random((int)seed) : new Random();
         var date = DateTime.Today.AddDays(GenerateRandomInt(random, 1, 30));
         return new BucketVersion()
         {
@@ -177,7 +177,7 @@ public class TestDataGenerator
     
     public BudgetedTransaction GenerateBudgetedTransaction(int? seed, Bucket bucket, BankTransaction bankTransaction)
     {
-        var random = seed != null ? new Random((int)seed) : new Random();
+        var random = seed is not null ? new Random((int)seed) : new Random();
         return new BudgetedTransaction()
         {
             BucketId = bucket.Id,
@@ -194,7 +194,7 @@ public class TestDataGenerator
     
     public ImportProfile GenerateImportProfile(int? seed, Account account)
     {
-        var random = seed != null ? new Random((int)seed) : new Random();
+        var random = seed is not null ? new Random((int)seed) : new Random();
         return new ImportProfile()
         {
             ProfileName = GenerateRandomString(random),
@@ -225,7 +225,7 @@ public class TestDataGenerator
     
     public MappingRule GenerateMappingRule(int? seed, BucketRuleSet bucketRuleSet)
     {
-        var random = seed != null ? new Random((int)seed) : new Random();
+        var random = seed is not null ? new Random((int)seed) : new Random();
         return new MappingRule()
         {
             BucketRuleSetId = bucketRuleSet.Id,
@@ -244,7 +244,7 @@ public class TestDataGenerator
     
     public RecurringBankTransaction GenerateRecurringBankTransaction(int? seed, Account account)
     {
-        var random = seed != null ? new Random((int)seed) : new Random();
+        var random = seed is not null ? new Random((int)seed) : new Random();
         var date = DateTime.Today.AddDays(GenerateRandomInt(random, 1, 30));
         return new RecurringBankTransaction()
         {

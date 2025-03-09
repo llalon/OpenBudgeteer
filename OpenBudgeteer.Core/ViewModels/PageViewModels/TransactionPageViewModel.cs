@@ -93,7 +93,7 @@ public class TransactionPageViewModel : TransactionListingViewModel
     {
         try
         {
-            if (NewTransaction == null) throw new Exception("New Transaction has not been initialized");
+            if (NewTransaction is null) throw new Exception("New Transaction has not been initialized");
             var result = NewTransaction.CreateOrUpdateTransaction();
             if (!result.IsSuccessful) return result;
             ResetNewTransaction();

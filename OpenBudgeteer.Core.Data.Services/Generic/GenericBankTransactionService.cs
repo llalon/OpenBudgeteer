@@ -21,7 +21,7 @@ public class GenericBankTransactionService : GenericBaseService<BankTransaction>
     public BankTransaction GetWithEntities(Guid id)
     {
         var result = _bankTransactionRepository.ByIdWithIncludedEntities(id);
-        if (result == null) throw new EntityNotFoundException();
+        if (result is null) throw new EntityNotFoundException();
         return result;
     }
     
@@ -68,7 +68,7 @@ public class GenericBankTransactionService : GenericBaseService<BankTransaction>
 
     public override BankTransaction Update(BankTransaction entity)
     {
-        if (entity.BudgetedTransactions != null && entity.BudgetedTransactions.Any())
+        if (entity.BudgetedTransactions is not null && entity.BudgetedTransactions.Any())
         {
             // Delete all existing bucket assignments, as they will be replaced by passed assignments
             var deletedIds =

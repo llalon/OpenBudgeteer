@@ -75,7 +75,7 @@ public class AccountViewModel : BaseEntityViewModel<Account>, IEquatable<Account
     /// <param name="account">Account instance</param>
     protected AccountViewModel(IServiceManager serviceManager, Account? account) : base(serviceManager)
     {
-        if (account == null)
+        if (account is null)
         {
             AccountId = Guid.Empty;
             _name = "New Account";

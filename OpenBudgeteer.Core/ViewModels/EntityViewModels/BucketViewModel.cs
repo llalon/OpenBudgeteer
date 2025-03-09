@@ -241,13 +241,14 @@ public class BucketViewModel : BaseEntityViewModel<Bucket>, IEquatable<BucketVie
         _details = string.Empty;
         _currentYearMonth = new DateOnly(yearMonth.Year, yearMonth.Month, 1);
         
-        if (bucket == null)
+        if (bucket is null || 
+           (bucket.Id == Guid.Empty && bucket.Name == "No Selection"))
         {
             BucketId = Guid.Empty;
             //BucketGroupId = bucketGroupId;    Will be set in CreateEmpty()
-            _name = "New Bucket";
-            _colorCode = Color.Transparent.Name;
-            _textColorCode = Color.Black.Name;
+            _name = bucket is null ? "New Bucket" : "No Selection";
+            _colorCode = bucket is null ? Color.Transparent.Name : string.Empty;
+            _textColorCode = bucket is null ? Color.Black.Name : string.Empty;
             _validFrom = yearMonth;
             _isInactive = false;
             _isInactiveFrom = DateOnly.MaxValue;
@@ -336,7 +337,7 @@ public class BucketViewModel : BaseEntityViewModel<Bucket>, IEquatable<BucketVie
         _isProgressBarVisible = viewModel.IsProgressbarVisible;
         _isHovered = viewModel.IsHovered;
 
-        if (viewModel.AvailableColors != null)
+        if (viewModel.AvailableColors is not null)
         {
             AvailableColors = new ObservableCollection<Color>();
             foreach (var availableColor in viewModel.AvailableColors)
@@ -345,7 +346,7 @@ public class BucketViewModel : BaseEntityViewModel<Bucket>, IEquatable<BucketVie
             }
         }
 
-        if (viewModel.AvailableBucketGroups != null)
+        if (viewModel.AvailableBucketGroups is not null)
         {
             AvailableBucketGroups = new ObservableCollection<BucketGroup>();
             foreach (var item in viewModel.AvailableBucketGroups)
@@ -403,9 +404,9 @@ public class BucketViewModel : BaseEntityViewModel<Bucket>, IEquatable<BucketVie
     public static BucketViewModel CreateForListing(
         IServiceManager serviceManager,
         Bucket bucket, 
-        DateOnly yearMonth)
+        DateOnly? yearMonth = null)
     {
-        return new BucketViewModel(serviceManager, bucket, yearMonth);
+        return new BucketViewModel(serviceManager, bucket, yearMonth ?? DateOnly.FromDateTime(DateTime.Now));
     }
 
     /// <summary>
@@ -421,6 +422,22 @@ public class BucketViewModel : BaseEntityViewModel<Bucket>, IEquatable<BucketVie
         DateOnly yearMonth)
     {
         return await Task.Run(() => CreateForListing(serviceManager, bucket, yearMonth));
+    }
+    
+    /// <summary>
+    /// Initialize ViewModel with a "No Selection" <see cref="Bucket"/>
+    /// </summary>
+    /// <param name="serviceManager">Reference to API based services</param>
+    public static BucketViewModel CreateNoSelection(IServiceManager serviceManager)
+    {
+        var noSelectBucket = new Bucket
+        {
+            Id = Guid.Empty,
+            BucketGroupId = Guid.Empty,
+            BucketGroup = new BucketGroup(),
+            Name = "No Selection"
+        };
+        return new BucketViewModel(serviceManager, noSelectBucket, DateOnly.FromDateTime(DateTime.Now));
     }
 
     /// <summary>

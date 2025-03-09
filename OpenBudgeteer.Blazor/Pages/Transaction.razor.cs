@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using OpenBudgeteer.Blazor.Common;
-using OpenBudgeteer.Blazor.Shared;
+using OpenBudgeteer.Blazor.Common.CustomMudFilter;
+using OpenBudgeteer.Blazor.Shared.Dialog;
 using OpenBudgeteer.Core.Common;
 using OpenBudgeteer.Core.Data.Contracts.Services;
 using OpenBudgeteer.Core.ViewModels.EntityViewModels;
@@ -23,25 +24,30 @@ public partial class Transaction : ComponentBase
     private TransactionPageViewModel _dataContext = null!;
     private bool _massEditEnabled;
     
+    private DateOnlyMudFilter<TransactionViewModel> _dateOnlyMudFilter;
+    private EntityViewModelMudFilter<AccountViewModel, TransactionViewModel> _accountMudFilter;
+    private EntityViewModelMudFilter<PartialBucketViewModel, TransactionViewModel> _bucketMudFilter;
+    
     private HashSet<TransactionViewModel> _selectedTransactions = new();
 
     private RecurringTransactionHandlerViewModel? _recurringTransactionHandlerViewModel;
 
-    private readonly Func<AccountViewModel, string> _convertAccount = x =>
-    {
-        try
-        {
-            return x.Name;
-        }
-        catch (Exception)
-        {
-            return string.Empty;
-        }
-    };
-
     protected override async Task OnInitializedAsync()
     {
         _dataContext = new TransactionPageViewModel(ServiceManager, YearMonthDataContext);
+        _dateOnlyMudFilter = new(new()
+        {
+            FilterFunction = x => 
+                x.TransactionDate.IsBetween(_dateOnlyMudFilter.DateRange.Start, _dateOnlyMudFilter.DateRange.End)
+        });
+        _accountMudFilter = new(new()
+        {
+            FilterFunction = x => _accountMudFilter.FilterItems.Contains(x.SelectedAccount)
+        });
+        _bucketMudFilter = new(new()
+        {
+            FilterFunction = x => x.Buckets.Any(bucket => _bucketMudFilter.FilterItems.Contains(bucket))
+        });
 
         await ReloadDataContext();
 
@@ -56,13 +62,28 @@ public partial class Transaction : ComponentBase
     {
         await HandleResult(await _dataContext.LoadDataAsync());
         _selectedTransactions.Clear();
+        
+        _accountMudFilter.AvailableItems = _dataContext.Transactions
+            .Select(i => i.SelectedAccount)
+            .Distinct()
+            .OrderBy(i => i.Name)
+            .ToList();
+        _bucketMudFilter.AvailableItems = _dataContext.Transactions
+            .SelectMany(i => i.Buckets)
+            .DistinctBy(i => i.SelectedBucketId)
+            .OrderBy(i => i.SelectedBucketName)
+            .ToList();
+        
+        _accountMudFilter.ResetFilter();
+        _dateOnlyMudFilter.ResetFilter();
+        _bucketMudFilter.ResetFilter();
     }
     
     private void TransactionDateChanged(DateTime? dateTime, TransactionViewModel context)
     {
         context.TransactionDate = DateOnly.FromDateTime(dateTime ?? DateTime.Today);
     }
-
+    
     private async Task ShowCreateTransactionDialog()
     {
         var reloadRequired = false;

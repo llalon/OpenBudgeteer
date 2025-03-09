@@ -227,7 +227,7 @@ public class ImportProfileViewModel : BaseEntityViewModel<ImportProfile>, IEquat
     /// <param name="importProfile">ImportProfile instance</param>
     protected ImportProfileViewModel(IServiceManager serviceManager, ImportProfile? importProfile) : base(serviceManager)
     {
-        if (importProfile == null)
+        if (importProfile is null)
         {
             _importProfileId = Guid.Empty;
             _profileName = string.Empty;

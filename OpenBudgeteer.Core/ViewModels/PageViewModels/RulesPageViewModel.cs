@@ -77,7 +77,7 @@ public class RulesPageViewModel : ViewModelBase
 
     private ViewModelOperationResult ValidateRuleSet(RuleSetViewModel ruleSetViewModel)
     {
-        if (ruleSetViewModel.TargetBucketId == Guid.Empty) return new(false, "No Target Bucket selected.");
+        if (ruleSetViewModel.TargetBucket.BucketId == Guid.Empty) return new(false, "No Target Bucket selected.");
         if (ruleSetViewModel.Priority <= 0) return new(false, "Priority should be a positive number.");
         return new(true);
     }

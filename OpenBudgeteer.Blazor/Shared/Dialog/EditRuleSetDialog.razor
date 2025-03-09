@@ -25,9 +25,9 @@
                 <MudButton
                     Size="Size.Small"
                     Class="mud-width-full bucket-indicator"
-                    Style="@($"background-color: {ColorTranslator.ToHtml(DataContext.TargetBucketColor)}; color: {ColorTranslator.ToHtml(DataContext.TargetBucketTextColor)}")"
+                    Style="@($"background-color: {ColorTranslator.ToHtml(DataContext.TargetBucket.Color)}; color: {ColorTranslator.ToHtml(DataContext.TargetBucket.TextColor)}")"
                     OnClick="ShowBucketSelectDialog">
-                    @DataContext.TargetBucketName
+                    @DataContext.TargetBucket.Name
                 </MudButton>
             </MudItem>
             <MudItem xs="12">
@@ -38,7 +38,7 @@
             {
                 <MudItem xs="12" sm="3">
                     <MudSelect T="MappingRuleComparisonField" @bind-Value="mappingRule.ComparisonField">
-                        @foreach (var comparisionField in Enum.GetValues<MappingRuleComparisonField>())
+                        @foreach (var comparisionField in Enum.GetValues<MappingRuleComparisonField>().Where(i => i > 0))
                         {
                             <MudSelectItem value="@comparisionField">@comparisionField.GetStringValue()</MudSelectItem>
                         }
@@ -99,7 +99,7 @@
         var dialogResult = await dialog.Result;
         if (dialogResult is { Canceled: false, Data: BucketViewModel selectedBucket })
         {
-            DataContext.UpdateSelectedBucket(selectedBucket);
+            DataContext.TargetBucket = selectedBucket;
         }
       
         StateHasChanged();

@@ -62,7 +62,7 @@ public class ImportPageViewModel : ViewModelBase
         set
         {
             Set(ref _selectedImportProfile, value);
-            if (value != null) ModifiedImportProfile =  ImportProfileViewModel.CreateAsCopy(value);
+            if (value is not null) ModifiedImportProfile =  ImportProfileViewModel.CreateAsCopy(value);
         }
     }
     
@@ -244,7 +244,7 @@ public class ImportPageViewModel : ViewModelBase
 
             using var lineReader = new StreamReader(stream, Encoding.GetEncoding("utf-8"));
             var line = await lineReader.ReadLineAsync();
-            while(line != null)
+            while(line is not null)
             {
                 stringBuilder.AppendLine(line);
                 line = await lineReader.ReadLineAsync();
@@ -287,7 +287,7 @@ public class ImportPageViewModel : ViewModelBase
             IdentifiedColumns.Clear();
             
             // Consistency checks
-            if (_fileLines == null) throw new Exception("File content not loaded.");
+            if (_fileLines is null) throw new Exception("File content not loaded.");
             if (ModifiedImportProfile.HeaderRow < 1 || ModifiedImportProfile.HeaderRow > _fileLines.Length)
                 throw new Exception("Cannot read headers with given header row.");
 
@@ -302,7 +302,7 @@ public class ImportPageViewModel : ViewModelBase
             
             // Make an initial selection after loading headers if possible
             if (IdentifiedColumns.Count == 0) throw new Exception("No headers found.");
-            if (SelectedImportProfile == null)
+            if (SelectedImportProfile is null)
             {
                 var firstSelection = IdentifiedColumns.First();
                 // No profile has been selected, column mapping is being created from scratch
@@ -370,7 +370,7 @@ public class ImportPageViewModel : ViewModelBase
             if (string.IsNullOrEmpty(ModifiedImportProfile.TransactionDateColumnName)) throw new Exception("Missing Mapping for Transaction Date");
             if (string.IsNullOrEmpty(ModifiedImportProfile.AmountColumnName)) throw new Exception("Missing Mapping for Amount");
             if (ModifiedImportProfile.Account.AccountId == Guid.Empty) throw new Exception("No target account selected");
-            if (_fileLines == null) throw new Exception("File content not loaded.");
+            if (_fileLines is null) throw new Exception("File content not loaded.");
 
             // Pre-Load Data for verification
             // Initialize CsvReader
