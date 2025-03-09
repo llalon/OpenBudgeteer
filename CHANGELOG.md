@@ -35,6 +35,10 @@
 
 * Switched License from MIT to GNU Affero General Public License v3.0
 
+### :warning: Known issues
+
+* Cursor jumping around in table view filters for specific cultures (e.g. `de-DE`), see [here](https://github.com/MudBlazor/MudBlazor/issues/8186#issuecomment-1949353592) for more details
+
 ## 1.9.1 (2025-01-11)
 
 ### :beetle: Bug Fixes
