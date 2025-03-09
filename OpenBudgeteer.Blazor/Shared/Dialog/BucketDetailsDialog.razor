@@ -80,27 +80,6 @@
                                     <MudText Class="col-numbers">@context.Item.Buckets.Where(b => b.SelectedBucketId == DataContext.BucketId).Sum(b => b.Amount).ToString("C", CultureInfo.CurrentCulture)*</MudText>
                                 }
                             </CellTemplate>
-                            <FilterTemplate>
-                                <MudGrid Spacing="6" Style="width:430px">
-                                    <MudItem xs="12">
-                                        <MudSelect
-                                            T="PartialBucketViewModel"
-                                            @bind-SelectedValues="_bucketMudFilter.SelectedItems"
-                                            MultiSelection="true"
-                                            MultiSelectionTextFunc="@(items => MultiSelectionTextHelper.GetText(items, "Buckets"))"
-                                            SelectAll="true">
-                                            @foreach (var account in _bucketMudFilter.AvailableItems)
-                                            {
-                                                <MudSelectItem Value="account">@account</MudSelectItem>
-                                            }
-                                        </MudSelect>
-                                    </MudItem>
-                                    <MudItem xs="12" Class="d-flex justify-end">
-                                        <MudButton OnClick="@(() => _bucketMudFilter.ResetFilterOnContextAsync(context))">Clear</MudButton>
-                                        <MudButton Color="@Color.Primary" OnClick="@(() => _bucketMudFilter.ApplyFilterOnContextAsync(context))">Filter</MudButton>
-                                    </MudItem>
-                                </MudGrid>
-                            </FilterTemplate>
                         </PropertyColumn>
                     </Columns>
                     <PagerContent>
