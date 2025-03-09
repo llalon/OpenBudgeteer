@@ -9,6 +9,7 @@
     * There are only two modes available: Display Mode and (Mass) Edit Mode
     * It's no longer possible to change the Amount assigment if no Bucket is selected (displaying the `No Selection` Bucket)
     * Bucket split is happening automatically based on total assigned Amount
+    * Rework buttons for Recurring Transaction due to sizing issues
   * Bucket Page:
     * Bucket Groups are now managed in a separate Dialog
     * Bucket Groups will only be displayed once a Bucket has been assigned to it (technical limitation)
@@ -24,6 +25,7 @@
     * Reworked Reconnect message which is now displayed in the App Header
 * Improved database connection handling and logging on application start
 * Add Info Page for database connection details and 3rd party software licenses
+* Coloring amounts on Bucket Page [#300](https://github.com/TheAxelander/OpenBudgeteer/pull/300) [#293](https://github.com/TheAxelander/OpenBudgeteer/issues/293) Thanks [YannisAm](https://github.com/YannisAm)
 
 ### :x: Removed
 
