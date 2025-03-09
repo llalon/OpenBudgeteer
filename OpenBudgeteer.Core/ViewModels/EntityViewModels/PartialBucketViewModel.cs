@@ -62,16 +62,6 @@ public class PartialBucketViewModel : ViewModelBase, ICloneable, IEquatable<Part
     /// </summary>
     public Color SelectedBucketTextColor => string.IsNullOrEmpty(SelectedBucketTextColorCode) ? Color.Black : Color.FromName(SelectedBucketTextColorCode);
 
-    private string _selectedBucketOutput;
-    /// <summary>
-    /// Helper property to generate an output for the Bucket including the assigned amount
-    /// </summary>
-    public string SelectedBucketOutput
-    {
-        get => _selectedBucketOutput;
-        set => Set(ref _selectedBucketOutput, value);
-    }
-
     private decimal _amount;
     /// <summary>
     /// Money that will be assigned to this Bucket
@@ -111,7 +101,6 @@ public class PartialBucketViewModel : ViewModelBase, ICloneable, IEquatable<Part
     /// <param name="amount">Amount to be assigned to this Bucket</param>
     protected PartialBucketViewModel(IServiceManager serviceManager, Bucket? bucket, decimal amount) : base(serviceManager)
     {
-        _selectedBucketOutput = string.Empty;
         _amount = amount;
 
         if (bucket is null)
@@ -149,7 +138,6 @@ public class PartialBucketViewModel : ViewModelBase, ICloneable, IEquatable<Part
         _selectedBucketName = viewModel.SelectedBucketName;
         _selectedBucketColorCode = viewModel.SelectedBucketColorCode;
         _selectedBucketTextColorCode = viewModel.SelectedBucketTextColorCode;
-        _selectedBucketOutput = viewModel.SelectedBucketOutput;
         _amount = viewModel.Amount;
     }
 
@@ -239,7 +227,7 @@ public class PartialBucketViewModel : ViewModelBase, ICloneable, IEquatable<Part
         return hashCode.ToHashCode();
     }
 
-    public override string ToString() => SelectedBucketOutput;
+    public override string ToString() => SelectedBucketName;
 
     #endregion
 }

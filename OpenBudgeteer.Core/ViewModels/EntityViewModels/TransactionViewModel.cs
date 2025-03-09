@@ -216,9 +216,6 @@ public class TransactionViewModel : BaseEntityViewModel<BankTransaction>, IEquat
                         serviceManager,
                         _availableBuckets.First(i => i.Id == budgetedTransaction.BucketId),
                         budgetedTransaction.Amount);
-                    newItem.SelectedBucketOutput = (newItem.Amount != transaction.Amount 
-                        ?  $"{newItem.SelectedBucketName} ({newItem.Amount})" 
-                        :  newItem.SelectedBucketName) ?? string.Empty;
                     Buckets.Add(newItem);
                 }
             }
@@ -470,7 +467,7 @@ public class TransactionViewModel : BaseEntityViewModel<BankTransaction>, IEquat
     }
 
     /// <summary>
-    /// Event that handles the deletion of teh requested Bucket
+    /// Event that handles the deletion of the requested Bucket
     /// </summary>
     /// <param name="sender">Object that has triggered the event</param>
     /// <param name="args">Event Arguments about deletion request</param>
