@@ -2,7 +2,6 @@
 @using System.Drawing
 @using System.Globalization
 @using OpenBudgeteer.Blazor.Common
-@using OpenBudgeteer.Core.Common.Extensions
 @using OpenBudgeteer.Core.ViewModels.EntityViewModels
 @using Color = MudBlazor.Color
 @using Size = MudBlazor.Size
@@ -101,10 +100,7 @@
         </PropertyColumn>
         <PropertyColumn Property="x => x.Payee"/>
         <PropertyColumn Property="x => x.Memo"/>
-        <PropertyColumn Property="x => x.Amount">
-            <CellTemplate>
-                <MudText Class="col-numbers">@context.Item.Amount.ToString("C", CultureInfo.CurrentCulture)</MudText>
-            </CellTemplate>
+        <PropertyColumn Property="x => x.Amount" Format="C" Culture="CultureInfo.CurrentCulture" CellClass="col-numbers">
             <EditTemplate>
                 <MudNumericField T="decimal" Format="N2" Culture="CultureInfo.CurrentCulture" @bind-Value="context.Item.Amount"/>
             </EditTemplate>

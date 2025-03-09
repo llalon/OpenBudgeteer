@@ -69,7 +69,7 @@
                         </PropertyColumn>
                         <PropertyColumn Property="x => x.Payee"/>
                         <PropertyColumn Property="x => x.Memo"/>
-                        <PropertyColumn Property="x => x.Amount">
+                        <PropertyColumn Property="x => x.Amount" Format="C" Culture="CultureInfo.CurrentCulture">
                             <CellTemplate>
                                 @if (context.Item.Buckets.Count <= 1)
                                 {

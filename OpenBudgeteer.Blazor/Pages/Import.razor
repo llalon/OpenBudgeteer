@@ -240,11 +240,7 @@
                             </PropertyColumn>
                             <PropertyColumn Property="x => x.Result.Payee"/>
                             <PropertyColumn Property="x => x.Result.Memo"/>
-                            <PropertyColumn Property="x => x.Result.Amount">
-                                <CellTemplate>
-                                    <MudText Class="col-numbers">@context.Item.Result.Amount.ToString("C", CultureInfo.CurrentCulture)</MudText>
-                                </CellTemplate>
-                            </PropertyColumn>
+                            <PropertyColumn Property="x => x.Result.Amount" Format="C" Culture="CultureInfo.CurrentCulture" CellClass="col-numbers"/>
                         </Columns>
                     </MudDataGrid>
                 }

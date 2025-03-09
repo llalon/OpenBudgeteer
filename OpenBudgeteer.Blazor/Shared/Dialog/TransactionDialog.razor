@@ -65,11 +65,7 @@
                 </PropertyColumn>
                 <PropertyColumn Property="x => x.Payee"/>
                 <PropertyColumn Property="x => x.Memo"/>
-                <PropertyColumn Property="x => x.Amount">
-                    <CellTemplate>
-                        <MudText Class="col-numbers">@context.Item.Amount.ToString("C", CultureInfo.CurrentCulture)</MudText>
-                    </CellTemplate>
-                </PropertyColumn>
+                <PropertyColumn Property="x => x.Amount" Format="C" Culture="CultureInfo.CurrentCulture" CellClass="col-numbers"/>
             </Columns>
             <PagerContent>
                 <MudDataGridPager T="TransactionViewModel" />
