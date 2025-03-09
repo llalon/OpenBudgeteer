@@ -44,7 +44,7 @@
                                 </MudGrid>
                             </FilterTemplate>
                         </PropertyColumn>
-                        <PropertyColumn Property="x => x.SelectedAccount" Title="Account" CellStyle="min-width: 150px">
+                        <PropertyColumn Property="x => x.SelectedAccount" Title="Account" CellStyle="min-width: 150px" Comparer="@(new MudComparer())">
                             <FilterTemplate>
                                 <MudGrid Spacing="6" Style="width:430px">
                                     <MudItem xs="12">

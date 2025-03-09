@@ -263,7 +263,7 @@
                         SortMode="SortMode.Multiple">
                         <Columns>
                             <PropertyColumn Property="x => x.RowIndex" Title="Row" CellClass="col-numbers" CellStyle="width:50px" Filterable="false"/>
-                            <PropertyColumn Property="x => x.Error" Title="Details">
+                            <PropertyColumn Property="x => x.Error" Title="Details" Comparer="@(new MudComparer())">
                                 <CellTemplate>
                                     <MudStack>
                                         <MudText>@context.Item.Error.Value</MudText>

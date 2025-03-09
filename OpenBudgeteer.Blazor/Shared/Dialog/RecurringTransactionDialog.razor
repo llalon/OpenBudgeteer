@@ -79,7 +79,7 @@
                         </MudSelect>
                     </EditTemplate>
                 </PropertyColumn>
-                <PropertyColumn Property="x => x.SelectedAccount">
+                <PropertyColumn Property="x => x.SelectedAccount" Comparer="@(new MudComparer())">
                     <EditTemplate>
                         <MudSelect T="AccountViewModel" @bind-Value="context.Item.SelectedAccount">
                             @foreach (var account in context.Item.AvailableAccounts)

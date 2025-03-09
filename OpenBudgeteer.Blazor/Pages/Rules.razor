@@ -61,7 +61,7 @@
                 </MudGrid>
             </FilterTemplate>
         </PropertyColumn>
-        <PropertyColumn Property="x => x.MappingRules" Title="Mapping Rules">
+        <PropertyColumn Property="x => x.MappingRules" Title="Mapping Rules" Comparer="@(new MudComparer())">
             <CellTemplate>
                 <MudStack Spacing="0">
                     @foreach (var mappingRule in context.Item.MappingRules)

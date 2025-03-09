@@ -68,7 +68,7 @@
                 </MudGrid>
             </FilterTemplate>
         </PropertyColumn>
-        <PropertyColumn Property="x => x.SelectedAccount" Title="Account" CellStyle="min-width: 150px">
+        <PropertyColumn Property="x => x.SelectedAccount" Title="Account" CellStyle="min-width: 150px" Comparer="@(new MudComparer())">
             <EditTemplate>
                 <MudSelect T="AccountViewModel" @bind-Value="context.Item.SelectedAccount">
                     @foreach (var account in context.Item.AvailableAccounts)
@@ -109,7 +109,7 @@
                 <MudNumericField T="decimal" Format="N2" Culture="CultureInfo.CurrentCulture" @bind-Value="context.Item.Amount"/>
             </EditTemplate>
         </PropertyColumn>
-        <PropertyColumn Property="x => x.Buckets" CellStyle="min-width: 300px">
+        <PropertyColumn Property="x => x.Buckets" CellStyle="min-width: 300px" Comparer="@(new MudComparer())">
             <CellTemplate>
                 <MudStack Spacing="2">
                     @foreach (var bucket in context.Item.Buckets)
