@@ -13,7 +13,8 @@ public class ImportProfileViewModel : BaseEntityViewModel<ImportProfile>
     {
         NoSettings = 0,
         CreditInSeparateColumns = 1,
-        DebitCreditAlwaysPositive = 2
+        DebitCreditAlwaysPositive = 2,
+        DebitCreditInverted = 3
     }
     
     private Guid _importProfileId;

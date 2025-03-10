@@ -123,6 +123,24 @@ internal class CsvBankTransactionMapping : CsvMapping<ParsedBankTransaction>
                     return true;
                 });
                 break;
+            // Debit and credit values are inverted
+            case ImportProfileViewModel.AdditionalSettingsForCreditValues.DebitCreditInverted:
+                MapUsing((transaction, row) =>
+                {
+                    if (string.IsNullOrEmpty(importProfile.AmountColumnName)) return false;
+
+                    var amountValue = row.Tokens[identifiedColumns.ToList().IndexOf(importProfile.AmountColumnName)];
+
+                    if (string.IsNullOrWhiteSpace(amountValue)) return false;
+                    
+                    var converter = AmountDecimalConverter.CreateConverter(importProfile);
+                    converter.TryConvert(amountValue, out var parsedAmountValue);
+
+                    transaction.Amount = parsedAmountValue * -1;
+
+                    return true;
+                });
+                break;
             // No special settings for Debit and Credit
             case ImportProfileViewModel.AdditionalSettingsForCreditValues.NoSettings:
             default:
